@@ -1,0 +1,21 @@
+# Ignore these files anywhere in the tree
+*.o
+*.a
+*.so
+*.mod
+*.x
+*.pyc
+*.v3breakpoints
+*.swp
+*.sublime-workspace
+*~
+
+#Ignore the contents of these directories
+eckit/
+fckit/
+oops/
+crtm/
+ioda/
+ufo/
+mpas/
+
