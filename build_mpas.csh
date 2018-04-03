@@ -151,9 +151,15 @@ if ( $test_mpas ) then
    echo "======================================================"
 
    cd $BUILD_MODEL
-   export OOPS_TRACE=1
-   #ctest -VV -R test_mpas_geometry
+   limit stacksize unlimited
+   setenv OOPS_TRACE 1
+   ctest -VV -R test_mpas_geometry
    #ctest -VV -R test_mpas_state
-   ctest -VV -R test_mpas_increment
-   #ctest -VV -R test_mpas_geometry
+   #ctest -VV -R test_mpas_increment
+   #ctest -VV -R test_mpas_model
+   #ctest -VV -R test_mpas_forecast
+   #ctest -VV -R test_mpas_hofx
+   #ctest -VV -R test_mpas_dirac_nicas
+   #ctest -VV -R test_mpas_3dvar
+   #ctest -VV -R test_mpas_3denvar
 endif
