@@ -2,9 +2,20 @@
 #---------------------------------------------------------
 # Author: Gael DESCOMBES, MMM/NCAR, 01/2018
 # Build PIO and MPAS libraries for OOPS-MPAS
+#
 # Prerequies:
 # - mpas-bundle github done
 # - place modified MPAS code in SRCMPAS / --> need to use mpas github
+#
+# Directory structure assumed...
+# /home/vagrant/code/
+#                   ├─mpas-bundle
+#                   └─MPAS-Release
+# /home/vagrant/build/
+#                    └─mpas-bundle
+# /home/vagrant/libs/
+#                   ├─build
+#                   └─ParallelIO
 #---------------------------------------------------------
 setenv MODEL mpas
 setenv BUNDLE_MODEL "/home/vagrant/code/mpas-bundle/"
