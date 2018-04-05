@@ -6,7 +6,7 @@ which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 # MPAS-Bundle specific Instruction (4/5/2018)
 --- Building the MPAS/JEDI bundle in Singularity environment ---
     cd /some/where/to/store/soure/code  or  /home/vagrant as a default
-    git clone https://github.com/JCSDA/mpas-bundle.git
+    git clone -b develop https://github.com/JCSDA/mpas-bundle.git
 
     modify and excute ./mpas-bundle/build_mpas.csh file
          This script contains all the build.
