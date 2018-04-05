@@ -8,43 +8,57 @@
 # - place modified MPAS code in SRCMPAS / --> need to use mpas github
 #
 # Directory structure assumed...
-# /home/vagrant/code/
-#                   ├─mpas-bundle
-#                   └─MPAS-Release
-# /home/vagrant/build/
-#                    └─mpas-bundle
-# /home/vagrant/libs/
-#                   ├─build
-#                   └─ParallelIO
+#   REL_DIR = /home/vagrant/ OR /some/where/to/store/soure/code
+#   ${REL_DIR}/code/
+#                  └─mpas-bundle
+#   ${REL_DIR}/build/
+#                   └─mpas-bundle
+#   ${REL_DIR}/libs/
+#                  ├─build
+#                  ├─ParallelIO
+#                  └─MPAS-Release
+#   ${REL_DIR}/data/
+#
 #---------------------------------------------------------
-setenv MODEL mpas
-setenv BUNDLE_MODEL "/home/vagrant/code/mpas-bundle/"
-setenv BUILD_MODEL "/home/vagrant/build/mpas-bundle/"
+setenv MODEL    mpas
+setenv REL_DIR  "/home/vagrant"
 
-setenv SRCMPAS /home/vagrant/code/MPAS-Release
-setenv LIBMPAS ${SRCMPAS}/link_libs
-setenv PIODIR /home/vagrant/libs
-setenv SRCPIO ${PIODIR}/ParallelIO 
-setenv BUILDPIO ${PIODIR}/build
-setenv LIBPIO ${BUILDPIO}/writable/pio2
+set comp_pio2=0     # Get and build a PIO2 library
+set comp_mpas=0     # Get and build MPAS model
+set libr_mpas=0     # Make a MPAS library to be used in MPAS/OOPS
+set oops_mpas=1     # clone and build a mpas-bundle
+set get_data=0      # Download and place test dataset, link UFO data
+set test_mpas=0     # launch a ctest
+
+#---------------------------------------------------------
+setenv SRC_DIR  ${REL_DIR}/code
+setenv BLD_DIR  ${REL_DIR}/build
+setenv EXT_DIR  ${REL_DIR}/libs
+
+setenv BUNDLE_MODEL ${SRC_DIR}/mpas-bundle
+setenv BUILD_MODEL  ${BLD_DIR}/mpas-bundle
+
+setenv SRCPIO   ${EXT_DIR}/ParallelIO 
+setenv BUILDPIO ${EXT_DIR}/build
+setenv LIBPIO   ${BUILDPIO}/writable/pio2
+setenv SRCMPAS  ${EXT_DIR}/MPAS-Release
+setenv LIBMPAS  ${SRCMPAS}/link_libs
 #setenv NETCDF /somewhere/already set
 #setenv PNETCDF /somewhere/already set 
 
-set comp_pio2=0
-set comp_mpas=0
-set libr_mpas=0
-set oops_mpas=1
-set test_mpas=0
-
 #===========================================================
+
+mkdir -p ${REL_DIR}
+mkdir -p ${SRC_DIR}
+mkdir -p ${BLD_DIR}
+mkdir -p ${EXT_DIR}
 
 if ( $comp_pio2 ) then
    echo ""
    echo "======================================================"
    echo " Git clone PIO2"
    echo "======================================================"
-   mkdir -p $PIODIR
-   cd $PIODIR
+   cd $EXT_DIR
    git clone https://github.com/NCAR/ParallelIO.git
 
    echo ""
@@ -68,6 +82,15 @@ if ( $comp_pio2 ) then
 endif
 
 if ( $comp_mpas ) then
+   echo ""
+   echo "======================================================"
+   echo " GET modified MPAS_Realise source code  <-- should use git, soon "
+   echo "======================================================"
+   cd ${EXT_DIR}
+   #git clone https://github.com/SOME_REPOSITORY
+   wget -c ftp://ftp.ucar.edu/pub/mmm/liuz/MPAS-Release_modified.tar.gz
+   tar zxvf MPAS-Release_modified.tar.gz
+
    # adding -fPIC in the MPAS makefile
    echo ""
    echo "======================================================"
@@ -87,7 +110,7 @@ if ( $libr_mpas ) then
    echo "======================================================"
    echo " Building MPAS Library libmpas.a for OOPS"
    echo "======================================================"
-   mkdir ${LIBMPAS}
+   mkdir -p ${LIBMPAS}
    cd ${LIBMPAS}
    cd ${LIBMPAS}
    rm -rf include
@@ -133,16 +156,27 @@ if ( $oops_mpas ) then
    echo "BUILD $BUILD_MODEL"
    echo "BUNDLE CODE $BUNDLE_MODEL"
 
-   mkdir -p $BUILD_MODEL/${MODEL}
-   cd $BUILD_MODEL
-   ecbuild  /home/vagrant/code/mpas-bundle
+   mkdir -p ${BUILD_MODEL}
+   cd ${BUILD_MODEL}
+   ecbuild  ${BUNDLE_MODEL}
    make -j4
-
-   #cp -v $BUNDLE_MODEL/statics/* $BUILD_MODEL/${MODEL}/test
-   #cp -v ~/jedi/data/mpas2/* $BUILD_MODEL/${MODEL}/test
 
 endif
 
+
+if ( $get_data ) then
+   echo ""
+   echo "======================================================"
+   echo " Download and place test dataset, link UFO data "
+   echo "======================================================"
+   cd ${REL_DIR}
+   wget -c http://www2.mmm.ucar.edu/people/bjung/files/data.tgz
+   tar zxvf data.tgz
+   cd ./data
+   cp *.DBL *.TBL namelist.atmosphere stream_list.* streams.atmosphere x1.2562.* ${BUILD_MODEL}/${MODEL}/test
+   ln -fs ${BUILD_MODEL}/ufo/test/Data/* ${BUILD_MODEL}/mpas/test/Data
+
+endif
 
 if ( $test_mpas ) then
    echo ""
