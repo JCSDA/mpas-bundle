@@ -3,14 +3,34 @@
 This software is licensed under the terms of the Apache Licence Version 2.0
 which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
---- Building the MPAS/JEDI bundle ---
+# MPAS-Bundle specific Instruction (4/5/2018)
+--- Building the MPAS/JEDI bundle in Singularity environment ---
+    cd /some/where/to/store/soure/code  or  /home/vagrant as a default
+    git clone -b develop https://github.com/JCSDA/mpas-bundle.git
 
-    cd /somewhere/to/store/source/code
-    git clone https://github.com/UCAR/mpas-bundle.git
+    modify and excute ./mpas-bundle/build_mpas.csh file
+         This script contains all the build.
+         Modify REL_DIR as /some/where/to/store/soure/code or default
+         Set the variables below as 1 (do) or 0(skip)
+             set comp_pio2=1     # Get and build a PIO2 library
+             set comp_mpas=1     # Get and build MPAS model
+             set libr_mpas=1     # Make a MPAS library to be used in MPAS/OOPS
+             set oops_mpas=1     # clone and build a mpas-bundle
+             set get_data=1      # Download and place test dataset, link UFO data
+             set test_mpas=1     # launch a ctest
+         Note: Above steps are all required at least once (in order).
+               Main step to build a mpas-bundle is "set oops_mpas=1".
 
-    cd /somewhere/to/build
-    ecbuild /somewhere/to/store/source/code/mpas-bundle
-    make -j4
+ 
+# General Instruction 
+#--- Building the MPAS/JEDI bundle ---
+#
+#    cd /somewhere/to/store/source/code
+#    git clone https://github.com/JCSDA/mpas-bundle.git
+#
+#    cd /somewhere/to/build
+#    ecbuild /somewhere/to/store/source/code/mpas-bundle
+#    make -j4
 
 The ecbuild command above will clone all the source code for the projects defined in the
 CMakeLists.txt in the bundle and the make command will build them all.
