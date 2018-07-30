@@ -88,7 +88,7 @@ if ( $comp_mpas ) then
    echo "======================================================"
    cd ${EXT_DIR}
    #git clone https://github.com/SOME_REPOSITORY
-   wget -c ftp://ftp.ucar.edu/pub/mmm/liuz/MPAS-Release_modified.tar.gz
+   wget -c http://www2.mmm.ucar.edu/people/bjung/files/MPAS-Release_modified_20180730.tgz
    tar zxvf MPAS-Release_modified.tar.gz
 
    # adding -fPIC in the MPAS makefile
@@ -170,7 +170,7 @@ if ( $get_data ) then
    echo " Download and place test dataset, link UFO data "
    echo "======================================================"
    cd ${REL_DIR}
-   wget -c http://www2.mmm.ucar.edu/people/bjung/files/data.tgz
+   wget -c http://www2.mmm.ucar.edu/people/bjung/files/data_20180730.tgz
    tar zxvf data.tgz
    cd ./data
    cp *.DBL *.TBL namelist.atmosphere stream_list.* streams.atmosphere x1.2562.* ${BUILD_MODEL}/${MODEL}/test
