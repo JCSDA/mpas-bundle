@@ -89,7 +89,7 @@ if ( $comp_mpas ) then
    cd ${EXT_DIR}
    #git clone https://github.com/SOME_REPOSITORY
    wget -c http://www2.mmm.ucar.edu/people/bjung/files/MPAS-Release_modified_20180730.tgz
-   tar zxvf MPAS-Release_modified.tar.gz
+   tar zxvf MPAS-Release_modified_20180730.tgz
 
    # adding -fPIC in the MPAS makefile
    echo ""
@@ -100,6 +100,8 @@ if ( $comp_mpas ) then
    setenv PIO ${LIBPIO} 
    echo "PIO $PIO"
    pwd
+   echo "make clean CORE=atmosphere"
+   make clean CORE=atmosphere
    echo "make gfortran CORE=atmosphere USE_PIO2=true"
    #make gfortran CORE=atmosphere USE_PIO2=true DEBUG=true
    make gfortran CORE=atmosphere USE_PIO2=true
@@ -171,7 +173,7 @@ if ( $get_data ) then
    echo "======================================================"
    cd ${REL_DIR}
    wget -c http://www2.mmm.ucar.edu/people/bjung/files/data_20180730.tgz
-   tar zxvf data.tgz
+   tar zxvf data_20180730.tgz
    cd ./data
    cp *.DBL *.TBL namelist.atmosphere stream_list.* streams.atmosphere x1.2562.* ${BUILD_MODEL}/${MODEL}/test
    ln -fs ${BUILD_MODEL}/ufo/test/Data/* ${BUILD_MODEL}/mpas/test/Data
