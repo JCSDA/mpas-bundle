@@ -21,7 +21,16 @@
 #
 #---------------------------------------------------------
 setenv MODEL    mpas
-setenv REL_DIR  "/home/vagrant"
+
+#CHEYENNE
+module purge
+module use /glade/u/home/xinzhang/modules/default
+module load jedi/gnu
+setenv REL_DIR "/glade/p_old/work/$LOGNAME/home/cheyenne"
+#setenv REL_DIR `pwd`
+
+#VAGRANT
+#setenv REL_DIR  "/home/vagrant"
 
 set comp_pio2=0     # Get and build a PIO2 library
 set comp_mpas=0     # Get and build MPAS model
@@ -160,6 +169,9 @@ if ( $oops_mpas ) then
 
    mkdir -p ${BUILD_MODEL}
    cd ${BUILD_MODEL}
+
+   setenv FC mpif90
+
    ecbuild  ${BUNDLE_MODEL}
    make -j4
 
