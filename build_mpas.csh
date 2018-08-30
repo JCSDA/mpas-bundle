@@ -53,6 +53,8 @@ mkdir -p ${SRC_DIR}
 mkdir -p ${BLD_DIR}
 mkdir -p ${EXT_DIR}
 
+setenv FC mpif90
+
 if ( $comp_pio2 ) then
    echo ""
    echo "======================================================"
@@ -74,7 +76,6 @@ if ( $comp_pio2 ) then
    mkdir -p $LIBPIO
    cd $BUILDPIO
    setenv CC mpicc
-   setenv FC mpif90
    cmake -DNetCDF_C_PATH=$NETCDF -DNetCDF_Fortran_PATH=$NETCDF -DPnetCDF_PATH=$PNETCDF -DCMAKE_INSTALL_PREFIX=${LIBPIO} -DPIO_ENABLE_TIMING=OFF $SRCPIO -DPIO_ENABLE_TIMING=OFF
    make
    make install
