@@ -23,14 +23,31 @@
 setenv MODEL    mpas
 
 #CHEYENNE
-module purge
-module use /glade/u/home/xinzhang/modules/default
-module load jedi/gnu
-setenv REL_DIR "/glade/p_old/work/$LOGNAME/home/cheyenne"
-#setenv REL_DIR `pwd`
+if ( `uname -n` =~ cheyenne* ) then
+#   setenv COMP intel
+   setenv COMP gnu
 
-#VAGRANT
-#setenv REL_DIR  "/home/vagrant"
+   module purge
+   module use /glade/u/home/xinzhang/modules/default
+   module load jedi/$COMP
+
+   #Enables lfs for large file retrieval
+   git lfs install
+
+   #This package requires the "code" and "build" directories to be two levels deep
+#   setenv REL_DIR "/glade/p/work/$LOGNAME/home/cheyenne"
+   setenv REL_DIR `pwd`
+   setenv REL_DIR $REL_DIR/../../
+endif
+
+if ( `uname -n` =~ vagrant* ) then
+   #VAGRANT
+   setenv REL_DIR  "/home/vagrant"
+else
+   #OTHERWISE
+   setenv CXX mpic++
+   setenv FC mpif90
+endif
 
 set comp_pio2=0     # Get and build a PIO2 library
 set comp_mpas=0     # Get and build MPAS model
@@ -83,7 +100,6 @@ if ( $comp_pio2 ) then
    mkdir -p $LIBPIO
    cd $BUILDPIO
    setenv CC mpicc
-   setenv FC mpif90
    cmake -DNetCDF_C_PATH=$NETCDF -DNetCDF_Fortran_PATH=$NETCDF -DPnetCDF_PATH=$PNETCDF -DCMAKE_INSTALL_PREFIX=${LIBPIO} -DPIO_ENABLE_TIMING=OFF $SRCPIO -DPIO_ENABLE_TIMING=OFF
    make
    make install
@@ -159,7 +175,8 @@ if ( $oops_mpas ) then
    echo " Compiling OOPS-MPAS"
    echo "======================================================" 
 
-   setenv MPAS_LIBRARIES "${LIBPIO}/lib/libpiof.a;${LIBPIO}/lib/libpioc.a;${LIBMPAS}/libmpas.a;/usr/local/lib/libnetcdf.so;/usr/local/lib/libmpi.so;/usr/local/lib/libpnetcdf.so;/usr/local/lib/libmpi_mpifh.so"
+#   setenv MPAS_LIBRARIES "${LIBPIO}/lib/libpiof.a;${LIBPIO}/lib/libpioc.a;${LIBMPAS}/libmpas.a;/usr/local/lib/libnetcdf.so;/usr/local/lib/libmpi.so;/usr/local/lib/libpnetcdf.so;/usr/local/lib/libmpi_mpifh.so"
+   setenv MPAS_LIBRARIES "${LIBPIO}/lib/libpiof.a;${LIBPIO}/lib/libpioc.a;${LIBMPAS}/libmpas.a;${NETCDF}/lib/libnetcdf.so;${MPI_ROOT}/lib/libmpi.so;${PNETCDF}/lib/libpnetcdf.a;${MPI_ROOT}/lib/libmpi.so" 
    #setenv MPAS_LIBRARIES "${LIBPIO}/lib/libpiof.a;${LIBPIO}/lib/libpioc.a;${LIBMPAS}/libmpas.a;/usr/local/lib/libnetcdf.so;/usr/local/lib/libmpi.so;/usr/local/lib/libpnetcdf.so"
    setenv MPAS_INCLUDES "${LIBMPAS}/include;${LIBPIO}/include"
    echo "MPAS_LIBRARIES: ${MPAS_LIBRARIES}"
@@ -169,8 +186,6 @@ if ( $oops_mpas ) then
 
    mkdir -p ${BUILD_MODEL}
    cd ${BUILD_MODEL}
-
-   setenv FC mpif90
 
    ecbuild  ${BUNDLE_MODEL}
    make -j4
