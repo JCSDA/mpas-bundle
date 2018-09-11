@@ -21,7 +21,34 @@
 #
 #---------------------------------------------------------
 setenv MODEL    mpas
-setenv REL_DIR  "/home/vagrant"
+
+#CHEYENNE
+if ( `uname -n` =~ cheyenne* ) then
+#   setenv COMP intel
+   setenv COMP gnu
+
+   module purge
+   module use /glade/u/home/xinzhang/modules/default
+   module load jedi/$COMP
+
+   #Enables lfs for large file retrieval
+   git lfs install
+
+   #This package requires the "code/mpas-bundle" and "build/mpas-bundle" directories to be two levels deep
+   setenv CODE_DIR `pwd`
+   cd ../../
+   setenv REL_DIR `pwd`
+   cd $CODE_DIR
+endif
+
+if ( `uname -n` =~ vagrant* ) then
+   #VAGRANT
+   setenv REL_DIR  "/home/vagrant"
+else
+   #OTHERWISE
+   setenv CXX  mpic++
+   setenv FC   mpif90
+endif
 
 set comp_pio2=0     # Get and build a PIO2 library
 set comp_mpas=0     # Get and build MPAS model
@@ -52,8 +79,6 @@ mkdir -p ${REL_DIR}
 mkdir -p ${SRC_DIR}
 mkdir -p ${BLD_DIR}
 mkdir -p ${EXT_DIR}
-
-setenv FC mpif90
 
 if ( $comp_pio2 ) then
    echo ""
@@ -150,8 +175,12 @@ if ( $oops_mpas ) then
    echo "======================================================"
    echo " Compiling OOPS-MPAS"
    echo "======================================================" 
-
+if ( `uname -n` =~ vagrant* ) then
    setenv MPAS_LIBRARIES "${LIBPIO}/lib/libpiof.a;${LIBPIO}/lib/libpioc.a;${LIBMPAS}/libmpas.a;/usr/local/lib/libnetcdf.so;/usr/local/lib/libmpi.so;/usr/local/lib/libpnetcdf.so;/usr/local/lib/libmpi_mpifh.so"
+endif
+if ( `uname -n` =~ cheyenne* ) then
+   setenv MPAS_LIBRARIES "${LIBPIO}/lib/libpiof.a;${LIBPIO}/lib/libpioc.a;${LIBMPAS}/libmpas.a;${NETCDF}/lib/libnetcdf.so;${MPI_ROOT}/lib/libmpi.so;${PNETCDF}/lib/libpnetcdf.a;${MPI_ROOT}/lib/libmpi.so" 
+endif
    #setenv MPAS_LIBRARIES "${LIBPIO}/lib/libpiof.a;${LIBPIO}/lib/libpioc.a;${LIBMPAS}/libmpas.a;/usr/local/lib/libnetcdf.so;/usr/local/lib/libmpi.so;/usr/local/lib/libpnetcdf.so"
    setenv MPAS_INCLUDES "${LIBMPAS}/include;${LIBPIO}/include"
    echo "MPAS_LIBRARIES: ${MPAS_LIBRARIES}"
@@ -161,9 +190,12 @@ if ( $oops_mpas ) then
 
    mkdir -p ${BUILD_MODEL}
    cd ${BUILD_MODEL}
+
    ecbuild  ${BUNDLE_MODEL}
    make -j4
 
+   #Substitute the correct REL_DIR into relevant testinput json files
+   sed -i -e "s#REL_DIR#$REL_DIR#" $BUILD_MODEL/mpas/test/testinput/*.json
 endif
 
 
@@ -178,7 +210,6 @@ if ( $get_data ) then
    cd ./data
    cp *.DBL *.TBL namelist.atmosphere stream_list.* streams.atmosphere x1.2562.* ${BUILD_MODEL}/${MODEL}/test
    ln -fs ${BUILD_MODEL}/ufo/test/Data/* ${BUILD_MODEL}/mpas/test/Data
-
 endif
 
 if ( $test_mpas ) then
@@ -200,3 +231,5 @@ if ( $test_mpas ) then
    #ctest -VV -R test_mpas_3dvar
    #ctest -VV -R test_mpas_3denvar
 endif
+
+
