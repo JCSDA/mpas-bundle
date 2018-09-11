@@ -34,10 +34,11 @@ if ( `uname -n` =~ cheyenne* ) then
    #Enables lfs for large file retrieval
    git lfs install
 
-   #This package requires the "code" and "build" directories to be two levels deep
-#   setenv REL_DIR "/glade/p/work/$LOGNAME/home/cheyenne"
+   #This package requires the "code/mpas-bundle" and "build/mpas-bundle" directories to be two levels deep
+   setenv CODE_DIR `pwd`
+   cd ../../
    setenv REL_DIR `pwd`
-   setenv REL_DIR $REL_DIR/../../
+   cd $CODE_DIR
 endif
 
 if ( `uname -n` =~ vagrant* ) then
@@ -45,8 +46,8 @@ if ( `uname -n` =~ vagrant* ) then
    setenv REL_DIR  "/home/vagrant"
 else
    #OTHERWISE
-   setenv CXX mpic++
-   setenv FC mpif90
+   setenv CXX  mpic++
+   setenv FC   mpif90
 endif
 
 set comp_pio2=0     # Get and build a PIO2 library
@@ -193,6 +194,8 @@ endif
    ecbuild  ${BUNDLE_MODEL}
    make -j4
 
+   #Substitute the correct REL_DIR into relevant testinput json files
+   sed -i -e "s#REL_DIR#$REL_DIR#" $BUILD_MODEL/mpas/test/testinput/*.json
 endif
 
 
@@ -207,7 +210,6 @@ if ( $get_data ) then
    cd ./data
    cp *.DBL *.TBL namelist.atmosphere stream_list.* streams.atmosphere x1.2562.* ${BUILD_MODEL}/${MODEL}/test
    ln -fs ${BUILD_MODEL}/ufo/test/Data/* ${BUILD_MODEL}/mpas/test/Data
-
 endif
 
 if ( $test_mpas ) then
@@ -229,3 +231,5 @@ if ( $test_mpas ) then
    #ctest -VV -R test_mpas_3dvar
    #ctest -VV -R test_mpas_3denvar
 endif
+
+
