@@ -1,10 +1,10 @@
 #!/bin/csh
 #---------------------------------------------------------
 # Author: Gael DESCOMBES, MMM/NCAR, 01/2018
-# Build PIO and MPAS libraries for OOPS-MPAS
+# Build mpas-bundle for OOPS-MPAS
 #
 # Prerequies:
-# - mpas-bundle github done
+# - mpas-bundle github done: 'git clone https://github.com/JCSDA/mpas-bundle'
 # - place modified MPAS code in SRCMPAS / --> need to use mpas github
 #
 # Directory structure assumed...
@@ -53,14 +53,17 @@ endif
 set comp_pio2=0     # Get and build a PIO2 library
 set comp_mpas=0     # Get and build MPAS model
 set libr_mpas=0     # Make a MPAS library to be used in MPAS/OOPS
+set build_odb=0     # Whether build ODB1+ODB2
+set enable_odb=0    # Whether enable ODB when builing mpas-bundle
 set oops_mpas=1     # clone and build a mpas-bundle
 set get_data=0      # Download and place test dataset, link UFO data
-set test_mpas=0     # launch a ctest
+set test_mpas=1     # launch a ctest
 
 #---------------------------------------------------------
 setenv SRC_DIR  ${REL_DIR}/code
 setenv BLD_DIR  ${REL_DIR}/build
 setenv EXT_DIR  ${REL_DIR}/libs
+setenv ODB_DIR  ${REL_DIR}/odb/install
 
 setenv BUNDLE_MODEL ${SRC_DIR}/mpas-bundle
 setenv BUILD_MODEL  ${BLD_DIR}/mpas-bundle
@@ -170,6 +173,14 @@ if ( $libr_mpas ) then
 
 endif
 
+# Warning: building ODB can be slow in singularity, just do it once
+#--------------------------
+if ( $build_odb ) then
+   cd ${REL_DIR}
+   ./code/mpas-bundle/setup_odb_build.sh
+   ./code/mpas-bundle/run_odb_build.sh
+endif
+
 if ( $oops_mpas ) then
    echo ""
    echo "======================================================"
@@ -191,7 +202,11 @@ endif
    mkdir -p ${BUILD_MODEL}
    cd ${BUILD_MODEL}
 
-   ecbuild  ${BUNDLE_MODEL}
+   if ( $enable_odb ) then
+     ecbuild -DODB_PATH=${ODB_DIR} -DENABLE_ODB=1 -DODB_API_PATH=${ODB_DIR} -DENABLE_ODB_API=1 ${BUNDLE_MODEL}
+   else
+     ecbuild ${BUNDLE_MODEL}
+   endif
    make -j4
 
    #Substitute the correct REL_DIR into relevant testinput json files
