@@ -6,7 +6,7 @@
 #   Make a few necessary modifications in the odb source code
 #
 
-OdbName="odb_api_bundle-0.18.0-Source"
+OdbName="odb_api_bundle-0.17.6-Source"
 EccodesName="eccodes-2.8.0-Source"
 
 OdbTarFile="${OdbName}.tar.gz"

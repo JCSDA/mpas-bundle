@@ -8,7 +8,7 @@
 # It is assumed that you have run setup_odb_build.sh prior to running this script,
 # and that you are cd'd to the directory where setup_odb_build.sh was run.
 
-OdbName="odb_api_bundle-0.18.0-Source"
+OdbName="odb_api_bundle-0.17.6-Source"
 EccodesName="eccodes-2.8.0-Source"
 
 ODB_PATH="$(pwd)/odb"
@@ -43,6 +43,7 @@ ecbuild -DCMAKE_INSTALL_PREFIX=${ODB_INSTALL_DIR} \
         -DENABLE_ODB=1 \
         -DENABLE_FORTRAN=1 \
         -DENABLE_MIGRATOR=1 \
+        -DHAVE_CXX11=1 \
         ../src/${OdbName}
 make -j4
 #ctest
