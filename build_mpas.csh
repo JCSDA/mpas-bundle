@@ -28,7 +28,7 @@ if ( `uname -n` =~ cheyenne* ) then
    setenv COMP gnu
 
    module purge
-   module use /glade/u/home/xinzhang/modules/default
+   module use /glade/work/bjung/panda-c/module/default
    module load jedi/$COMP
 
    #Enables lfs for large file retrieval
@@ -57,7 +57,7 @@ set build_odb=0     # Whether build ODB1+ODB2
 set enable_odb=0    # Whether enable ODB when builing mpas-bundle
 set oops_mpas=1     # clone and build a mpas-bundle
 set get_data=0      # Download and place test dataset, link UFO data
-set test_mpas=1     # launch a ctest
+set test_mpas=0     # launch a ctest
 
 #---------------------------------------------------------
 setenv SRC_DIR  ${REL_DIR}/code
@@ -117,8 +117,8 @@ if ( $comp_mpas ) then
    echo "======================================================"
    cd ${EXT_DIR}
    #git clone https://github.com/SOME_REPOSITORY
-   wget -c http://www2.mmm.ucar.edu/people/bjung/files/MPAS-Release_modified_20180730.tgz
-   tar zxvf MPAS-Release_modified_20180730.tgz
+   wget -c http://www2.mmm.ucar.edu/people/bjung/files/MPAS-Release_modified_20181107.tgz
+   tar zxvf MPAS-Release_modified_20181107.tgz
 
    # adding -fPIC in the MPAS makefile
    echo ""
@@ -220,10 +220,10 @@ if ( $get_data ) then
    echo " Download and place test dataset, link UFO data "
    echo "======================================================"
    cd ${REL_DIR}
-   wget -c http://www2.mmm.ucar.edu/people/bjung/files/data_20180914.tgz
-   tar zxvf data_20180914.tgz
+   wget -c http://www2.mmm.ucar.edu/people/bjung/files/data_20181107_small.tgz
+   tar zxvf data_20181107_small.tgz
    cd ./data
-   cp *.DBL *.TBL namelist.atmosphere stream_list.* streams.atmosphere x1.2562.graph.* restart.*.nc ${BUILD_MODEL}/${MODEL}/test
+   cp *.DBL *.TBL namelist.atmosphere* stream_list.* streams.atmosphere x1.2562.graph.* restart.*.nc ${BUILD_MODEL}/${MODEL}/test
    ln -fs ${BUILD_MODEL}/ufo/test/Data/* ${BUILD_MODEL}/mpas/test/Data
 endif
 
