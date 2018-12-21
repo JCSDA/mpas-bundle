@@ -216,8 +216,8 @@ endif
    endif
    make -j4
 
-   #Substitute the correct REL_DIR into relevant testinput json files
-   sed -i -e "s#REL_DIR#$REL_DIR#" $BUILD_MODEL/mpas/test/testinput/*.json
+   #Substitute the correct REL_DIR into relevant testinput yaml files
+   sed -i -e "s#REL_DIR#$REL_DIR#" $BUILD_MODEL/mpas/test/testinput/*.yaml
 endif
 
 
