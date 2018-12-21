@@ -91,6 +91,13 @@ if ( $comp_pio2 ) then
    cd $EXT_DIR
    git clone https://github.com/NCAR/ParallelIO.git
 
+   # 21 DEC 2018: PIO2 master branch causes a substantial increase
+   # in wall-time for mpas-bundle.  Temporarily use old hash
+   # until this bug is fixed.
+   cd $SRCPIO
+   git checkout -b OLD_SHA 96e562f7c8bd55b9ad50144c332516bf571a94c6
+   cd $EXT_DIR
+
    echo ""
    echo "======================================================"
    echo " Compiling PIO2"
