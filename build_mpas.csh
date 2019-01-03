@@ -72,6 +72,9 @@ setenv SRCPIO   ${EXT_DIR}/ParallelIO
 setenv BUILDPIO ${EXT_DIR}/build
 setenv LIBPIO   ${BUILDPIO}/writable/pio2
 setenv SRCMPAS  ${EXT_DIR}/MPAS-Release
+setenv GITMPAS  ${EXT_DIR}/MPAS-Model
+setenv GITMPAS_BRANCH develop-for-jedi
+#setenv GITMPAS_BRANCH develop #TODO: get changes merged into develop
 setenv LIBMPAS  ${SRCMPAS}/link_libs
 #setenv NETCDF /somewhere/already set
 #setenv PNETCDF /somewhere/already set 
@@ -123,9 +126,16 @@ if ( $comp_mpas ) then
    echo " GET modified MPAS_Realise source code  <-- should use git, soon "
    echo "======================================================"
    cd ${EXT_DIR}
-   #git clone https://github.com/SOME_REPOSITORY
-   wget -c http://www2.mmm.ucar.edu/people/bjung/files/MPAS-Release_modified_20181107.tgz
-   tar zxvf MPAS-Release_modified_20181107.tgz
+   rm -rf ${SRCMPAS}
+
+#   #Use this when MPAS-Dev develop is updated for mpas-bundle
+#   rm -rf ${GITMPAS}
+#   git clone -b ${GITMPAS_BRANCH} https://github.com/MPAS-Dev 
+
+#USE THIS ONE (temporary)
+   git clone -b ${GITMPAS_BRANCH} https://github.com/jjguerrette/MPAS-Model
+   cd ${GITMPAS}
+   git checkout-index -f -a --prefix=${SRCMPAS}/
 
    # adding -fPIC in the MPAS makefile
    echo ""
@@ -133,14 +143,14 @@ if ( $comp_mpas ) then
    echo " Compiling MPAS"
    echo "======================================================"
    cd ${SRCMPAS}
-   setenv PIO ${LIBPIO} 
+   setenv PIO ${LIBPIO}
    echo "PIO $PIO"
    pwd
    echo "make clean CORE=atmosphere"
    make clean CORE=atmosphere
    echo "make gfortran CORE=atmosphere USE_PIO2=true"
-   #make gfortran CORE=atmosphere USE_PIO2=true DEBUG=true
-   make gfortran CORE=atmosphere USE_PIO2=true
+   #make gfortran CORE=atmosphere USE_PIO2=true SHARELIB=true DEBUG=true
+   make gfortran CORE=atmosphere USE_PIO2=true SHARELIB=true
 endif
 
 if ( $libr_mpas ) then
@@ -155,7 +165,7 @@ if ( $libr_mpas ) then
    mkdir include
    rm -f libmpas.a
 
-   set list_dirlib = "${SRCMPAS}/src/driver ${SRCMPAS}/src/external/esmf_time_f90/ ${SRCMPAS}/src/framework ${SRCMPAS}/src/core_atmosphere ${SRCMPAS}/src/operators"
+   set list_dirlib = "${SRCMPAS}/src/driver ${SRCMPAS}/src/external/esmf_time_f90/ ${SRCMPAS}/src/framework ${SRCMPAS}/src/core_atmosphere ${SRCMPAS}/src/core_atmosphere/physics ${SRCMPAS}/src/operators"
 
    foreach dirlib ( $list_dirlib )
       echo "-------------------------------------------------------------------"
@@ -212,9 +222,17 @@ endif
    if ( $enable_odb ) then
      ecbuild -DODB_PATH=${ODB_DIR} -DENABLE_ODB=1 -DODB_API_PATH=${ODB_DIR} -DENABLE_ODB_API=1 ${BUNDLE_MODEL}
    else
-     ecbuild ${BUNDLE_MODEL}
+#     ecbuild ${BUNDLE_MODEL}
+#     ecbuild --build=debug ${BUNDLE_MODEL}
+     ecbuild --build=release ${BUNDLE_MODEL}
+   echo ""
+   echo "Building mpas-bundle using make files from ecbuild;"
+   echo " progress can be monitored in ${BUILD_MODEL}/make.log."
+   echo ""
+
    endif
-   make -j4
+   #make VERBOSE=1 -j4 >& make.log
+   make -j4 >& make.log
 
    #Substitute the correct REL_DIR into relevant testinput yaml files
    sed -i -e "s#REL_DIR#$REL_DIR#" $BUILD_MODEL/mpas/test/testinput/*.yaml
@@ -243,6 +261,14 @@ if ( $test_mpas ) then
    cd $BUILD_MODEL
    limit stacksize unlimited
    setenv OOPS_TRACE 1
+
+   #Compiler-specific environment variables for unformatted binary file units
+   #Units 101-200 are used for reading big-endian RRTMG LW/SW data files in 
+   #MPAS.  All other units use the native byte order. More variables may need 
+   #to be added as other compilers are used (e.g., XL, Cray, PGI, FTN).
+   setenv GFORTRAN_CONVERT_UNIT 'native;big_endian:101-200' #GNU
+   setenv F_UFMTENDIAN 'big:101-200'                        #INTEL
+
    ctest -VV -R test_mpas_geometry
    #ctest -VV -R test_mpas_state
    #ctest -VV -R test_mpas_increment
