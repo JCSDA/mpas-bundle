@@ -31,6 +31,12 @@ if ( `uname -n` =~ cheyenne* ) then
    module use /glade/work/bjung/panda-c/module/default
    module load jedi/$COMP
 
+   #Plotting use python
+   module load python/2.7.13
+   module load numpy/1.12.0
+   module load matplotlib/2.0.0
+   module load netcdf4-python
+
    #Enables lfs for large file retrieval
    git lfs install
 
@@ -58,7 +64,7 @@ set enable_odb=0    # Whether enable ODB when builing mpas-bundle
 set oops_mpas=1     # clone and build a mpas-bundle
 set get_data=0      # Download and place test dataset, link UFO data
 set test_mpas=0     # launch a ctest
-
+set plot=0          # plot the results 
 #---------------------------------------------------------
 setenv SRC_DIR  ${REL_DIR}/code
 setenv BLD_DIR  ${REL_DIR}/build
@@ -280,4 +286,16 @@ if ( $test_mpas ) then
    #ctest -VV -R test_mpas_3denvar
 endif
 
+if ( $plot ) then
+   echo ""
+   echo "======================================================"
+   echo " Plotting"
+   echo "======================================================"
+
+   cd $BUILD_MODEL/mpas/test/graphics
+
+   python plot_cost_grad.py
+#  python plot_obs_nc_loc.py
+#  python plot_diag_omaomb_profile.py
+endif
 
