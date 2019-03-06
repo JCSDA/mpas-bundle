@@ -31,12 +31,6 @@ if ( `uname -n` =~ cheyenne* ) then
    module use /glade/work/bjung/panda-c/module/default
    module load jedi/$COMP
 
-   #Plotting use python
-   module load python/2.7.13
-   module load numpy/1.12.0
-   module load matplotlib/2.0.0
-   module load netcdf4-python
-
    #Enables lfs for large file retrieval
    git lfs install
 
@@ -293,7 +287,13 @@ if ( $plot ) then
    echo "======================================================"
 
    cd $BUILD_MODEL/mpas/test/graphics
-
+   if ( `uname -n` =~ cheyenne* ) then
+      module purge
+      module load python/2.7.13
+      module load numpy/1.12.0
+      module load matplotlib/2.0.0
+      module load netcdf4-python
+   endif
    python plot_cost_grad.py
 #  python plot_obs_nc_loc.py
 #  python plot_diag_omaomb_profile.py
