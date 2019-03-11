@@ -55,9 +55,9 @@ set comp_mpas=0     # Get and build MPAS model
 set libr_mpas=0     # Make a MPAS library to be used in MPAS/OOPS
 set build_odb=0     # Whether build ODB1+ODB2
 set enable_odb=0    # Whether enable ODB when builing mpas-bundle
-set oops_mpas=0     # clone and build a mpas-bundle
+set oops_mpas=1     # clone and build a mpas-bundle
 set get_data=0      # Download and place test dataset, link UFO data
-set test_mpas=1     # launch a ctest
+set test_mpas=0     # launch a ctest
 set plot=0          # plot the results 
 #---------------------------------------------------------
 setenv SRC_DIR  ${REL_DIR}/code
