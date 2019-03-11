@@ -31,12 +31,6 @@ if ( `uname -n` =~ cheyenne* ) then
    module use /glade/work/bjung/panda-c/module/default
    module load jedi/$COMP
 
-   #Plotting use python
-   module load python/2.7.13
-   module load numpy/1.12.0
-   module load matplotlib/2.0.0
-   module load netcdf4-python
-
    #Enables lfs for large file retrieval
    git lfs install
 
@@ -61,9 +55,9 @@ set comp_mpas=0     # Get and build MPAS model
 set libr_mpas=0     # Make a MPAS library to be used in MPAS/OOPS
 set build_odb=0     # Whether build ODB1+ODB2
 set enable_odb=0    # Whether enable ODB when builing mpas-bundle
-set oops_mpas=1     # clone and build a mpas-bundle
+set oops_mpas=0     # clone and build a mpas-bundle
 set get_data=0      # Download and place test dataset, link UFO data
-set test_mpas=0     # launch a ctest
+set test_mpas=1     # launch a ctest
 set plot=0          # plot the results 
 #---------------------------------------------------------
 setenv SRC_DIR  ${REL_DIR}/code
@@ -275,15 +269,15 @@ if ( $test_mpas ) then
    setenv GFORTRAN_CONVERT_UNIT 'native;big_endian:101-200' #GNU
    setenv F_UFMTENDIAN 'big:101-200'                        #INTEL
 
-   ctest -VV -R test_mpas_geometry
+   #ctest -VV -R test_mpas_geometry
    #ctest -VV -R test_mpas_state
    #ctest -VV -R test_mpas_increment
    #ctest -VV -R test_mpas_model
    #ctest -VV -R test_mpas_forecast
    #ctest -VV -R test_mpas_hofx
    #ctest -VV -R test_mpas_dirac_nicas
-   #ctest -VV -R test_mpas_3dvar
-   #ctest -VV -R test_mpas_3denvar
+   ctest -VV -R test_mpas_3dvar
+   ctest -VV -R test_mpas_3denvar
 endif
 
 if ( $plot ) then
@@ -293,9 +287,16 @@ if ( $plot ) then
    echo "======================================================"
 
    cd $BUILD_MODEL/mpas/test/graphics
-
+   if ( `uname -n` =~ cheyenne* ) then
+      module purge
+      module load python/2.7.13
+      module load numpy/1.12.0
+      module load matplotlib/2.0.0
+      module load netcdf4-python
+   endif
    python plot_cost_grad.py
 #  python plot_obs_nc_loc.py
 #  python plot_diag_omaomb_profile.py
+#  python plot_BUMP_diag.py
 endif
 
