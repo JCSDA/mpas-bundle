@@ -296,7 +296,7 @@ if ( $plot ) then
    endif
    python plot_cost_grad.py
 #  python plot_obs_nc_loc.py
-#  python plot_diag_omaomb_profile.py
+#  python plot_diag_omaomb.py
 #  python plot_BUMP_diag.py
 endif
 
