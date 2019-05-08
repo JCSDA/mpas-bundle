@@ -290,8 +290,17 @@ if ( ${build_pio2} ) then
    cd $BLDPIO
    setenv CC mpicc
    cmake -DNetCDF_C_PATH=$NETCDF -DNetCDF_Fortran_PATH=$NETCDF -DPnetCDF_PATH=$PNETCDF -DCMAKE_INSTALL_PREFIX=${LIBPIO} -DPIO_ENABLE_TIMING=OFF $SRCPIO -DPIO_ENABLE_TIMING=OFF
-   make
-   make install
+   make |& tee make.log
+
+   echo ""
+   echo "NOTE: the preceding output from make is archived in ${BLDPIO}/make.log"
+   echo ""
+
+   make install |& tee make_install.log
+
+   echo ""
+   echo "NOTE: the preceding output from make is archived in ${BLDPIO}/make_install.log"
+   echo ""
 endif
 
 if ( $build_mpas ) then
@@ -328,8 +337,12 @@ if ( $build_mpas ) then
    if ( $DEBUG_BUILD ) then
       setenv MPASDEBUG "DEBUG=true"
    endif
-   echo "make ${MODELFC} CORE=atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG}"
-   make ${MODELFC} CORE=atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG}
+   echo "make ${MODELFC} CORE=atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG} |& tee make.log"
+   make ${MODELFC} CORE=atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG} |& tee make.log
+
+   echo ""
+   echo "NOTE: the preceding output from make is archived in ${BLDMPAS}/make.log"
+   echo ""
 endif
 
 if ( $libr_mpas ) then
@@ -365,7 +378,6 @@ if ( $libr_mpas ) then
    # build libmpas.a
    mv *.a *.o *.mod *.h ./include
    ar -ru libmpas.a ./include/*.o
-
 endif
 
 ## Warning: building ODB can be slow in singularity, just do it once
@@ -423,15 +435,22 @@ if ( $build_bundle ) then
 
    mkdir -p ${BNDL_BLD}
    cd ${BNDL_BLD}
-   ecbuild --build=${BLDTYPE} ${BNDL_SRC}
+   ecbuild --build=${BLDTYPE} ${BNDL_SRC} |& tee ecbuild.log0
 
    echo ""
-   echo "Building ${BNDLNAME}-bundle using make files from ecbuild;"
-   echo " progress can be monitored in ${BNDL_BLD}/make.log."
+   echo "NOTE: the preceding output from ecbuild is archived in ${BNDL_BLD}/ecbuild.log0"
    echo ""
 
-   #make VERBOSE=1 -j4 >& make.log
-   make -j4 >& make.log
+   echo ""
+   echo "Building ${BNDLNAME}-bundle using make files from ecbuild..."
+   echo ""
+
+   #make VERBOSE=1 -j4 |& tee make.log
+   make -j4 |& tee make.log
+
+   echo ""
+   echo "NOTE: the preceding output from make is archived in ${BNDL_BLD}/make.log"
+   echo ""
 
    #Substitute the correct REL_DIR into relevant testinput yaml files
    sed -i -e "s#REL_DIR#${REL_DIR}#" ${BNDL_BLD}/mpas/test/testinput/*.yaml
