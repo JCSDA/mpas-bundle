@@ -43,7 +43,8 @@
 #-------------------------------------------------------------------------------
 # Select components to build
 #---------------------------
-# (R) - Required
+# (J) - Required, but already done in JCSDA jedi containers and modules
+# (R) - Required: always needs to be done at least once
 # (O) - Optional
 # (U) - Unsupported
 # (lib) - library
@@ -51,8 +52,7 @@
 # + each component depends on those preceding it
 # + users may execute build_mpas.csh with one or multiple selected at a time
 #-------------------------------------------------------------------------------
-#TODO: include PIO in environment and remove build_pio2 section
-set build_pio2=1    # (R, lib): Get and build PIO_GITBRANCH of PIO2 library
+set build_pio2=0    # (J, lib): Get and build PIO_GITBRANCH of PIO2 library
 set build_mpas=1    # (R, lib): Get and build MPAS_GITBRANCH of MPAS-model
 set libr_mpas=1     # (R, lib): Make a shared MPAS library to be used in mpas-bundle build
 #set build_odb=0     # (U, lib): Build ODB1+ODB2
@@ -113,18 +113,12 @@ else
    ## HPC
 
    #Set additional compiler-specific ENV variables
-   #setenv CC mpicc #works with gnu? Others?
    switch ( "${COMP}" )
    case gnu:
       set MODELFC="gfortran"
-      setenv CXX    mpic++
-      setenv FC     mpif90
       breaksw
    case intel:
       set MODELFC="ifort"
-      setenv CC     mpicc
-      setenv CXX    mpicxx
-      setenv FC     mpif90
       breaksw
    default:
       echo "ERROR: COMP=${COMP} is not currently supported"
@@ -148,7 +142,7 @@ else
       default:
          #JCSDA - maintained by Mark Miesch
          echo ""; echo "Using JCSDA docker"; echo ""
-         set DOCKER_PATH="/glade/u/home/miesch/modules/default"
+         set DOCKER_PATH="/glade/work/miesch/modules/modulefiles/core"
          if ( "$COMP" == gnu && "$MPICOMP" == openmpi ) then
             set jedi_module="gnu-openmpi"
          else if ( "$COMP" == gnu && "$MPICOMP" == mpt ) then
@@ -193,6 +187,39 @@ else
    cd -
 endif
 
+#Set compiler environment variables
+#Beginning May 2019, the JCSDA containers & modules should have compiler environment variables defined.
+if ( (! $?MPI_CC) || (! $?MPI_CXX) || (! $?MPI_FC) ) then
+   switch ( "${MPICOMP}" )
+   case openmpi:
+      setenv CC     mpicc
+      setenv CXX    mpicxx
+      setenv FC     mpifort
+      breaksw
+   case mpt:
+      setenv CC     mpicc
+      setenv CXX    mpicxx
+      setenv FC     mpif90
+      breaksw
+   case mpich:
+      setenv CC     mpicc
+      setenv CXX    mpicxx
+      setenv FC     mpifort
+      breaksw
+   default:
+      echo "ERROR: MPICOMP=${MPICOMP} is not currently supported"
+      exit 10
+   endsw
+else
+   echo "Setting compiler environment variables using module/container environment variables"
+   setenv CC     $MPI_CC
+   setenv CXX    $MPI_CXX
+   setenv FC     $MPI_FC
+endif
+echo "CC            = ${CC}"
+echo "CXX           = ${CXX}"
+echo "FC            = ${FC}"
+
 #Set build directory name with BNDL_BLD_NAME 
 set BNDL_BLD_NAME="${BNDLNAME}-bundle"
 #Add a suffix for managinge multiple builds
@@ -222,12 +249,11 @@ set EXT_BLD_DIR=${REL_DIR}/libs/build
 set PIO_GITREPO="ParallelIO"
 set SRCPIO=${EXT_SRC_DIR}/${PIO_GITREPO}
 set BLDPIO=${EXT_BLD_DIR}/PIO_${COMP}-${MPICOMP}_${ENV_PRVDR}
-#TODO: utilize PIO from external environment for all compiler selections
-#if ( "${ENV_PRVDR}" == JCSDA ) then
-#   set LIBPIO=$PIO
-#else
+if (! $?PIO  ) then
    set LIBPIO=${BLDPIO}/writable/pio2
-#endif
+else
+   set LIBPIO=$PIO
+endif
 echo "LIBPIO        = $LIBPIO"
 
 #MPAS-Model
@@ -258,8 +284,6 @@ mkdir -p ${SRC_DIR}
 mkdir -p ${BLD_DIR}
 mkdir -p ${EXT_SRC_DIR}
 
-#TODO: utilize PIO from external environment for all compiler selections
-#if ( ${build_pio2} && ${ENV_PRVDR} != JCSDA ) then
 if ( ${build_pio2} ) then
    echo ""
    echo "======================================================"
@@ -398,7 +422,7 @@ if ( $build_bundle ) then
 
       switch ( "$platform" )
       case vagrant*:
-         setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};/usr/local/lib/libnetcdf.so;/usr/local/lib/libmpi.so;/usr/local/lib/libpnetcdf.so;/usr/local/lib/libmpi_mpifh.so"
+         setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};/usr/local/lib/libnetcdf.so;/usr/local/lib/libmpi.so;/usr/local/lib/libpnetcdf.a;/usr/local/lib/libmpi_mpifh.so"
          breaksw
       default:
          setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};${NETCDF}/lib/libnetcdf.so;${MPI_ROOT}/lib/libmpi.so;${PNETCDF}/lib/libpnetcdf.a;${MPI_ROOT}/lib/libmpi.so"
