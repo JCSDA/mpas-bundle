@@ -490,7 +490,6 @@ if ( $get_data ) then
    tar zxvf data_20190226_small.tgz
    cd ./data
    cp *.DBL *.TBL namelist.atmosphere* stream_list.* streams.atmosphere x1.2562.graph.* restart.*.nc ${BNDL_BLD}/${BNDLNAME}/test
-   ln -fs ${BNDL_BLD}/ufo/test/Data/* ${BNDL_BLD}/mpas/test/Data
 endif
 
 if ( $test_mpas ) then
