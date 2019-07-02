@@ -28,6 +28,6 @@ ecbuild_bundle( PROJECT oops   GIT "https://github.com/JCSDA/oops.git"         B
 ecbuild_bundle( PROJECT crtm   GIT "https://github.com/JCSDA/crtm.git"         BRANCH develop        UPDATE )
 ecbuild_bundle( PROJECT ioda   GIT "https://github.com/JCSDA/ioda.git"         BRANCH develop        UPDATE )
 ecbuild_bundle( PROJECT ufo    GIT "https://github.com/JCSDA/ufo.git"          BRANCH develop        UPDATE )
-ecbuild_bundle( PROJECT mpas   GIT "https://github.com/JCSDA/mpas.git"         BRANCH develop        UPDATE )
+ecbuild_bundle( PROJECT mpas-jedi   GIT "https://github.com/JCSDA/mpas-jedi"   BRANCH develop        UPDATE )
 
 ecbuild_bundle_finalize()

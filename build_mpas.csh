@@ -80,6 +80,9 @@ set ENV_PRVDR="JCSDA"
 #Set BNDLNAME (mpas, unless used to build another jedi bundle)
 set BNDLNAME="mpas"
 
+#Set REPONAME (Name of Github repo for MPAS/JEDI)
+set REPONAME="mpas-jedi"
+
 # Additional Notes:
 #   (1) Not all combinations of COMP/MPICOMP are supported
 #
@@ -477,7 +480,7 @@ if ( $build_bundle ) then
    echo ""
 
    #Substitute the correct REL_DIR into relevant testinput yaml files
-   sed -i -e "s#REL_DIR#${REL_DIR}#" ${BNDL_BLD}/mpas/test/testinput/*.yaml
+   sed -i -e "s#REL_DIR#${REL_DIR}#" ${BNDL_BLD}/${REPONAME}/test/testinput/*.yaml
 endif
 
 if ( $get_data ) then
@@ -489,7 +492,7 @@ if ( $get_data ) then
    wget -c http://www2.mmm.ucar.edu/people/bjung/files/data_20190226_small.tgz
    tar zxvf data_20190226_small.tgz
    cd ./data
-   cp *.DBL *.TBL namelist.atmosphere* stream_list.* streams.atmosphere x1.2562.graph.* restart.*.nc ${BNDL_BLD}/${BNDLNAME}/test
+   cp *.DBL *.TBL namelist.atmosphere* stream_list.* streams.atmosphere x1.2562.graph.* restart.*.nc ${BNDL_BLD}/${REPONAME}/test
 endif
 
 if ( $test_mpas ) then
