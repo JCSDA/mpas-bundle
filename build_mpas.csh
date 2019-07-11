@@ -489,8 +489,8 @@ if ( $get_data ) then
    echo " Download and place test dataset, link UFO data "
    echo "======================================================"
    cd ${REL_DIR}
-   wget -c http://www2.mmm.ucar.edu/people/bjung/files/data_20190226_small.tgz
-   tar zxvf data_20190226_small.tgz
+   wget -c http://www2.mmm.ucar.edu/people/bjung/files/data_20190709_small.tgz
+   tar zxvf data_20190709_small.tgz
    cd ./data
    cp *.DBL *.TBL namelist.atmosphere* stream_list.* streams.atmosphere x1.2562.graph.* restart.*.nc ${BNDL_BLD}/${REPONAME}/test
 endif
