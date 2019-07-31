@@ -28,8 +28,8 @@
 #                  │     ├─${PIO_GITREPO}
 #                  │     └─${MPAS_GITREPO}
 #                  └─build/
-#                         ├─PIO_${COMP}-${MPICOMP}_${ENV_PRVDR}
-#                         └─MPAS_${COMP}-${MPICOMP}_debug=${DEBUG_BUILD}_${ENV_PRVDR}
+#                         ├─PIO_${COMP}-${MPICOMP}
+#                         └─MPAS_${COMP}-${MPICOMP}_debug=${DEBUG_BUILD}
 #   ${REL_DIR}/data/
 #
 #  Note:
@@ -59,7 +59,7 @@ set libr_mpas=1     # (R, lib): Make a shared MPAS library to be used in mpas-bu
 #set enable_odb=0    # (U, lib): Enable ODB when building mpas-bundle
 set build_bundle=1  # (R, lib): Clone and build all components of mpas-bundle (see CMakeLists.txt)
 set get_data=1      # (R, app): Download and place test dataset, link UFO data
-set test_mpas=0     # (O, app): Launch a ctest
+set test_mpas=0     # (O, app): Launch the ctests
 set plot=0          # (O, app): Plot the results 
 
 #-------------------------------------------------------------------------------
@@ -74,9 +74,6 @@ set MPICOMP="openmpi"
 #Set to 1 to turn on debug flags for MPAS-Model and mpas-bundle
 set DEBUG_BUILD=0
 
-#Select ENV_PRVDR for HPC platforms [ JCSDA (D); MMM ]
-set ENV_PRVDR="JCSDA"
-
 #Set BNDLNAME (mpas, unless used to build another jedi bundle)
 set BNDLNAME="mpas"
 
@@ -86,7 +83,7 @@ set REPONAME="mpas-jedi"
 # Additional Notes:
 #   (1) Not all combinations of COMP/MPICOMP are supported
 #
-#   (2) users must build all desired lib components when changing COMP, MPICOMP, or ENV_PRVDR
+#   (2) users must build all desired lib components when changing COMP or MPICOMP
 #
 #   (3) when rebuilding, only components with code changes or with dependencies need to be selected
 #
@@ -99,6 +96,10 @@ set REPONAME="mpas-jedi"
 set platform=`uname -n`
 echo "Setting up environment for platform: $platform"
 
+#Initialize environment setup files
+set JEDIENVFILE="JEDIENV_${COMP}-${MPICOMP}"
+echo "## JEDI ENVIRONMENT SETUP" | tee $JEDIENVFILE.csh $JEDIENVFILE.sh
+
 if ( "$platform" =~ vagrant* ) then
    ## VAGRANT
 
@@ -106,9 +107,7 @@ if ( "$platform" =~ vagrant* ) then
    set COMP="gnu"
    set MPICOMP="openmpi"
 
-   set ENV_PRVDR="JCSDA"
    set MODELFC="gfortran"
-   set DOCKER_PATH="none"
    set jedi_module="none"
 
    set REL_DIR="/home/vagrant"
@@ -131,39 +130,28 @@ else
    switch ( "$platform" )
    case cheyenne*:
       #CHEYENNE - `uname -n` only works on login node
+      echo "source /etc/profile.d/modules.csh" | tee -a $JEDIENVFILE.csh
+      echo "source /etc/profile.d/modules.sh" >> $JEDIENVFILE.sh
 
-      switch ( "${ENV_PRVDR}" )
-      case MMM:
-         #MMM - maintained by BJ Jung
-         if ( "$COMP" == gnu && "$MPICOMP" == openmpi ) then
-            echo ""; echo "Using MMM docker"; echo ""
-            set DOCKER_PATH="/glade/work/bjung/panda-c/module/default"
-            set jedi_module="gnu"
-            breaksw
-         endif
-         set ENV_PRVDR="JCSDA"
-      default:
-         #JCSDA - maintained by Mark Miesch
-         echo ""; echo "Using JCSDA docker"; echo ""
-         set DOCKER_PATH="/glade/work/miesch/modules/modulefiles/core"
-         if ( "$COMP" == gnu && "$MPICOMP" == openmpi ) then
-            set jedi_module="gnu-openmpi"
-         else if ( "$COMP" == gnu && "$MPICOMP" == mpt ) then
-            set jedi_module="gnu-mpt"
-         else if ( "$COMP" == intel && "$MPICOMP" == mpt ) then
-            set jedi_module="intel-mpt"
-         else
-            echo "ERROR: COMP=${COMP}-MPICOMP=${MPICOMP} is not currently supported"
-            exit 11
-         endif
-         breaksw
-      endsw
+      #Modules maintained by Mark Miesch at JCSDA
+      set MODULEDIR=/glade/work/miesch/modules
+      echo "setenv OPT $MODULEDIR" | tee -a $JEDIENVFILE.csh
+      echo "export OPT=$MODULEDIR" >> $JEDIENVFILE.sh
+      echo 'module use $OPT/modulefiles/core' | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
+      if ( "$COMP" == gnu && "$MPICOMP" == openmpi ) then
+         set jedi_module="gnu-openmpi"
+      else if ( "$COMP" == gnu && "$MPICOMP" == mpt ) then
+         set jedi_module="gnu-mpt"
+      else if ( "$COMP" == intel && "$MPICOMP" == mpt ) then
+         set jedi_module="intel-mpt"
+      else
+         echo "ERROR: COMP=${COMP}-MPICOMP=${MPICOMP} is not currently supported"
+         exit 11
+      endif
 
-      source /etc/profile.d/modules.csh
-      module purge
-      module use $DOCKER_PATH
-      module load jedi/$jedi_module
-      module list
+      echo 'module purge' | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
+      echo "module load jedi/$jedi_module" | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
+      echo 'module list' | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
 
       breaksw
    default:
@@ -174,7 +162,6 @@ else
 #   #TODO: extend to other platforms, possibly using similar module interface
 #   if ( `which module` =~ ??? ) then
 #      module purge
-#      module use $DOCKER_PATH
 #      module load jedi/$jedi_module
 #   else
 #      echo "ERROR: module statements not supported by this platform"
@@ -182,13 +169,32 @@ else
 #   #endif
 
    #Enables lfs for large file retrieval
-   git lfs install
+   echo 'git lfs install' | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
 
    #TODO: add write-protected test for ../../
    cd ../../
    set REL_DIR=`pwd`
    cd -
 endif
+
+echo 'limit stacksize unlimited' | tee -a $JEDIENVFILE.csh
+echo 'ulimit -s unlimited' >> $JEDIENVFILE.sh
+echo 'setenv OOPS_TRACE 1' | tee -a $JEDIENVFILE.csh
+echo 'export OOPS_TRACE=1' >> $JEDIENVFILE.sh
+
+#Compiler-specific environment variables for unformatted binary file units
+#Units 101-200 are used for reading big-endian RRTMG LW/SW data files in 
+#MPAS.  All other units use the native byte order. More variables may need 
+#to be added as other compilers are used (e.g., XL, Cray, PGI, FTN).
+# GNU:
+echo "setenv GFORTRAN_CONVERT_UNIT 'native;big_endian:101-200'" | tee -a $JEDIENVFILE.csh
+echo "export GFORTRAN_CONVERT_UNIT='native;big_endian:101-200'" >> $JEDIENVFILE.sh
+
+# INTEL:
+echo "setenv F_UFMTENDIAN 'big:101-200'" | tee -a $JEDIENVFILE.csh
+echo "export F_UFMTENDIAN='big:101-200'" >> $JEDIENVFILE.sh
+
+source $JEDIENVFILE.csh
 
 #Set compiler environment variables
 #Beginning May 2019, the JCSDA containers & modules should have compiler environment variables defined.
@@ -226,12 +232,12 @@ echo "FC            = ${FC}"
 #Set build directory name with BNDL_BLD_NAME 
 set BNDL_BLD_NAME="${BNDLNAME}-bundle"
 #Add a suffix for managinge multiple builds
-# (e.g., unique sets of compiler, ENV_PRVDR, or git branch)
-#set BNDL_BLD_NAME="${BNDL_BLD_NAME}_${COMP}-${MPICOMP}_debug=${DEBUG_BUILD}_${ENV_PRVDR}"
+# (e.g., unique sets of compilers, debug status, git branch)
+#set BNDL_BLD_NAME="${BNDL_BLD_NAME}_${COMP}-${MPICOMP}_debug=${DEBUG_BUILD}"
+#set BNDL_BLD_NAME="${BNDL_BLD_NAME}_feature--my_feature_branch"
+#set BNDL_BLD_NAME="${BNDL_BLD_NAME}_bugfix--my_bugfix_branch"
 
-echo "ENV_PRVDR     = ${ENV_PRVDR}"
 echo "MODELFC       = ${MODELFC}"
-echo "DOCKER_PATH   = ${DOCKER_PATH}"
 echo "jedi_module   = ${jedi_module}"
 echo "BNDL_BLD_NAME = ${BNDL_BLD_NAME}"
 
@@ -251,7 +257,7 @@ set EXT_BLD_DIR=${REL_DIR}/libs/build
 #PIO
 set PIO_GITREPO="ParallelIO"
 set SRCPIO=${EXT_SRC_DIR}/${PIO_GITREPO}
-set BLDPIO=${EXT_BLD_DIR}/PIO_${COMP}-${MPICOMP}_${ENV_PRVDR}
+set BLDPIO=${EXT_BLD_DIR}/PIO_${COMP}-${MPICOMP}
 if (! $?PIO  ) then
    set LIBPIO=${BLDPIO}/writable/pio2
 else
@@ -270,7 +276,7 @@ set MPAS_GITTREE="jjguerrette"
 set MPAS_GITBRANCH=develop-for-jedi
 
 set SRCMPAS=${EXT_SRC_DIR}/${MPAS_GITREPO}
-set BLDMPAS=${EXT_BLD_DIR}/MPAS_${COMP}-${MPICOMP}_debug=${DEBUG_BUILD}_${ENV_PRVDR}
+set BLDMPAS=${EXT_BLD_DIR}/MPAS_${COMP}-${MPICOMP}_debug=${DEBUG_BUILD}
 set LIBMPAS=${BLDMPAS}/link_libs
 
 #ODB
@@ -495,38 +501,70 @@ if ( $get_data ) then
    cp *.DBL *.TBL namelist.atmosphere* stream_list.* streams.atmosphere x1.2562.graph.* restart.*.nc ${BNDL_BLD}/${REPONAME}/test
 endif
 
+#===============================================
+# Create a ctest executable
+#===============================================
+#Either 'sh' or 'csh' will work
+set TESTSHELL=csh 
+set CTESTBNDL=ctest_$BNDL_BLD_NAME.$TESTSHELL
+set CTESTOUT=ctest.out
+cd ${BNDL_BLD}
+cat > $CTESTBNDL << EOF
+#!/bin/$TESTSHELL
+source $BNDL_SRC/$JEDIENVFILE.$TESTSHELL
+cd $BNDL_BLD/${REPONAME}/test
+
+## Run all tests
+ctest |& tee $CTESTOUT
+
+## Select groups of tests
+#ctest -R mpas_hofx |& tee -a $CTESTOUT
+#ctest -R mpas_forecast |& tee -a $CTESTOUT
+#ctest -R mpas_3dvar |& tee -a $CTESTOUT
+#ctest -R mpas_3denvar |& tee -a $CTESTOUT
+#ctest -R mpas_4denvar |& tee -a $CTESTOUT
+#ctest -R mpas_bumpcov |& tee -a $CTESTOUT
+
+## Rerun failed tests
+#ctest --rerun-failed |& tee -a $CTESTOUT
+
+exit \$?
+EOF
+chmod u+x $CTESTBNDL
+
+echo ""; echo "Execute ${BNDL_BLD}/$CTESTBNDL to run the ctests"; echo ""
 if ( $test_mpas ) then
    echo ""
    echo "======================================================"
-   echo " Testing OOPS-MPAS"
+   echo " Running ctests for $BNDL_BLD_NAME"
    echo "======================================================"
+   switch ( "$platform" )
+   case cheyenne*:
+      #===============================================
+      # Create a job script
+      #===============================================
+      cat > $CTESTBNDL.pbs << EOF
+#!/bin/$TESTSHELL
+#PBS -N ctest_$BNDL_BLD_NAME
+#PBS -l select=1:ncpus=12:mpiprocs=12
+#PBS -l walltime=0:15:00
+#PBS -q economy
+#PBS -A NMMM0015
+#PBS -M $USER@ucar.edu
+#PBS -m abe
+#PBS -j oe
 
-   #TODO: (1) put all of these commands in an executable script
-   #      (2) automatically generate a wrapper script for HPC
-   #          applications including module loads, etc.
+./$CTESTBNDL
+EOF
+      chmod u+x $CTESTBNDL.pbs
+      echo ""; echo "Submitting a job for the ctests ($CTESTBNDL.pbs) from "`pwd`; echo ""
+      qsub $CTESTBNDL.pbs
 
-   cd $BNDL_BLD
-   limit stacksize unlimited
-   setenv OOPS_TRACE 1
-
-   #Compiler-specific environment variables for unformatted binary file units
-   #Units 101-200 are used for reading big-endian RRTMG LW/SW data files in 
-   #MPAS.  All other units use the native byte order. More variables may need 
-   #to be added as other compilers are used (e.g., XL, Cray, PGI, FTN).
-   # GNU:
-   setenv GFORTRAN_CONVERT_UNIT 'native;big_endian:101-200'
-   # INTEL:
-   setenv F_UFMTENDIAN 'big:101-200'
-
-   #ctest -VV -R test_mpas_geometry
-   #ctest -VV -R test_mpas_state
-   #ctest -VV -R test_mpas_increment
-   #ctest -VV -R test_mpas_model
-   #ctest -VV -R test_mpas_forecast
-   #ctest -VV -R test_mpas_hofx
-   #ctest -VV -R test_mpas_dirac_nicas
-   ctest -VV -R test_mpas_3dvar
-   ctest -VV -R test_mpas_3denvar
+      breaksw;
+   case vagrant*:
+      ./$CTESTBNDL
+      breaksw;
+   endsw
 endif
 
 if ( $plot ) then

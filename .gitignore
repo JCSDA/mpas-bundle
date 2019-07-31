@@ -22,3 +22,6 @@ gsw/
 ropp-ufo/
 saber/
 
+#Ignore JEDIENV files
+JEDIENV*
+
