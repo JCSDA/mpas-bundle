@@ -20,7 +20,7 @@ ecbuild_bundle_initialize()
 
 ecbuild_requires_macro_version( 2.7 )
 
-#ecbuild_bundle( PROJECT eckit     GIT "https://github.com/ECMWF/eckit.git"       TAG 0.23.0 )
+#ecbuild_bundle( PROJECT eckit     GIT "https://github.com/ECMWF/eckit.git"       TAG 1.1.0 )
 ecbuild_bundle( PROJECT fckit     GIT "https://github.com/JCSDA/fckit.git"       BRANCH develop  UPDATE )
 ecbuild_bundle( PROJECT ropp-ufo  GIT "https://github.com/JCSDA/ropp-test.git"   BRANCH develop  UPDATE )
 ecbuild_bundle( PROJECT saber     GIT "https://github.com/JCSDA/saber.git"       BRANCH develop  UPDATE )
