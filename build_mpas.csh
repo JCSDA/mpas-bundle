@@ -58,7 +58,6 @@ set libr_mpas=1     # (R, lib): Make a shared MPAS library to be used in mpas-bu
 #set build_odb=0     # (U, lib): Build ODB1+ODB2
 #set enable_odb=0    # (U, lib): Enable ODB when building mpas-bundle
 set build_bundle=1  # (R, lib): Clone and build all components of mpas-bundle (see CMakeLists.txt)
-set get_data=1      # (R, app): Download and place test dataset, link UFO data
 set test_mpas=0     # (O, app): Launch the ctests
 set plot=0          # (O, app): Plot the results 
 
@@ -485,20 +484,9 @@ if ( $build_bundle ) then
    echo "NOTE: the preceding output from make is archived in ${BNDL_BLD}/make.log"
    echo ""
 
-   #Substitute the correct REL_DIR into relevant testinput yaml files
-   sed -i -e "s#REL_DIR#${REL_DIR}#" ${BNDL_BLD}/${REPONAME}/test/testinput/*.yaml
-endif
-
-if ( $get_data ) then
-   echo ""
-   echo "======================================================"
-   echo " Download and place test dataset, link UFO data "
-   echo "======================================================"
-   cd ${REL_DIR}
-   wget -c http://www2.mmm.ucar.edu/people/bjung/files/data_20190709_small.tgz
-   tar zxvf data_20190709_small.tgz
-   cd ./data
-   cp *.DBL *.TBL namelist.atmosphere* stream_list.* streams.atmosphere x1.2562.graph.* restart.*.nc ${BNDL_BLD}/${REPONAME}/test
+   # Link TBL and DBL lookup table files from MPAS-Model build directory
+   ln -sfv ${BLDMPAS}/src/core_atmosphere/physics/physics_wrf/files/*.TBL ${BNDL_BLD}/${REPONAME}/test
+   ln -sfv ${BLDMPAS}/src/core_atmosphere/physics/physics_wrf/files/*.DBL ${BNDL_BLD}/${REPONAME}/test
 endif
 
 #===============================================
