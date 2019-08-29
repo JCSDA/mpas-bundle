@@ -561,13 +561,10 @@ if ( $plot ) then
    echo " Plotting"
    echo "======================================================"
 
-   cd $BNDL_BLD/mpas/test/graphics
+   cd $BNDL_BLD/mpas-jedi/test/graphics
    if ( "$platform" =~ cheyenne* ) then
-      module purge
-      module load python/2.7.13
-      module load numpy/1.12.0
-      module load matplotlib/2.0.0
-      module load netcdf4-python
+      module load python
+      ncar_pylib
    endif
    python plot_cost_grad.py
 #  python plot_obs_nc_loc.py
