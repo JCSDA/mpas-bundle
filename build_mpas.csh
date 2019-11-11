@@ -564,10 +564,10 @@ if ( $plot ) then
    cd $BNDL_BLD/mpas-jedi/test/graphics
    if ( "$platform" =~ cheyenne* ) then
       module load python
-      ncar_pylib
+      source /glade/u/apps/ch/opt/usr/bin/npl/ncar_pylib.csh 
    endif
    python plot_cost_grad.py
-#  python plot_obs_nc_loc.py
+#  python plot_obs_nc_loc.py ctest 2018041500
 #  python plot_diag_omaomb.py
 #  python plot_BUMP_diag.py
 endif
