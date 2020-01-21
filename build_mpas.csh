@@ -52,6 +52,7 @@
 # + each component depends on those preceding it
 # + users may execute build_mpas.csh with one or multiple selected at a time
 #-------------------------------------------------------------------------------
+set custom_pio=0    # (O, lib): Use custom PIO version instead of JCSDA provided version
 set build_pio2=0    # (J, lib): Get and build PIO_GITBRANCH of PIO2 library
 set build_mpas=1    # (R, lib): Get and build MPAS_GITBRANCH of MPAS-model
 set libr_mpas=1     # (R, lib): Make a shared MPAS library to be used in mpas-bundle build
@@ -67,11 +68,14 @@ set plot=0          # (O, app): Plot the results
 #Select COMP for HPC platforms [ gnu (D); intel ]
 set COMP="gnu"
 
-#Select MPICOMP for HPC platforms [ openmpi (D); mpt ]
+#Select MPICOMP for HPC platforms [ openmpi (D); mpt; impi ]
 set MPICOMP="openmpi"
 
-#Set to 1 to turn on debug flags for MPAS-Model and mpas-bundle
-set DEBUG_BUILD=0
+#Select 'Release' for greatest bundle build optimization [ Debug (D); RelWithDebInfo; Release ]
+set BUNDLE_BUILD_TYPE=Debug
+
+#Set to 1 to turn on debug build for MPAS-Model and PIO
+set LIB_DEBUG_BUILD=0
 
 #Set BNDLNAME (mpas, unless used to build another jedi bundle)
 set BNDLNAME="mpas"
@@ -143,6 +147,8 @@ else
          set jedi_module="gnu-mpt"
       else if ( "$COMP" == intel && "$MPICOMP" == mpt ) then
          set jedi_module="intel-mpt"
+      else if ( "$COMP" == intel && "$MPICOMP" == impi ) then
+         set jedi_module="intel-impi"
       else
          echo "ERROR: COMP=${COMP}-MPICOMP=${MPICOMP} is not currently supported"
          exit 11
@@ -193,6 +199,10 @@ echo "export GFORTRAN_CONVERT_UNIT='native;big_endian:101-200'" >> $JEDIENVFILE.
 echo "setenv F_UFMTENDIAN 'big:101-200'" | tee -a $JEDIENVFILE.csh
 echo "export F_UFMTENDIAN='big:101-200'" >> $JEDIENVFILE.sh
 
+#===========================================================
+# Setup the current environment
+#===========================================================
+
 source $JEDIENVFILE.csh
 
 #Set compiler environment variables
@@ -214,6 +224,11 @@ if ( (! $?MPI_CC) || (! $?MPI_CXX) || (! $?MPI_FC) ) then
       setenv CXX    mpicxx
       setenv FC     mpifort
       breaksw
+   case impi:
+      setenv CC     mpicc
+      setenv CXX    mpicxx
+      setenv FC     mpifort
+      breaksw
    default:
       echo "ERROR: MPICOMP=${MPICOMP} is not currently supported"
       exit 10
@@ -228,11 +243,12 @@ echo "CC            = ${CC}"
 echo "CXX           = ${CXX}"
 echo "FC            = ${FC}"
 
+
 #Set build directory name with BNDL_BLD_NAME 
 set BNDL_BLD_NAME="${BNDLNAME}-bundle"
 #Add a suffix for managinge multiple builds
 # (e.g., unique sets of compilers, debug status, git branch)
-#set BNDL_BLD_NAME="${BNDL_BLD_NAME}_${COMP}-${MPICOMP}_debug=${DEBUG_BUILD}"
+#set BNDL_BLD_NAME="${BNDL_BLD_NAME}_${COMP}-${MPICOMP}_build=${BUNDLE_BUILD_TYPE}"
 #set BNDL_BLD_NAME="${BNDL_BLD_NAME}_feature--my_feature_branch"
 #set BNDL_BLD_NAME="${BNDL_BLD_NAME}_bugfix--my_bugfix_branch"
 
@@ -256,12 +272,14 @@ set EXT_BLD_DIR=${REL_DIR}/libs/build
 #PIO
 set PIO_GITREPO="ParallelIO"
 set SRCPIO=${EXT_SRC_DIR}/${PIO_GITREPO}
-set BLDPIO=${EXT_BLD_DIR}/PIO_${COMP}-${MPICOMP}
-if (! $?PIO  ) then
+set BLDPIO=${EXT_BLD_DIR}/PIO_${COMP}-${MPICOMP}_debug=${LIB_DEBUG_BUILD}
+set PIO_GITBRANCH=master
+if ( (! $?PIO  ) || ( ${custom_pio} ) ) then
    set LIBPIO=${BLDPIO}/writable/pio2
 else
    set LIBPIO=$PIO
 endif
+setenv PIO $LIBPIO
 echo "LIBPIO        = $LIBPIO"
 
 #MPAS-Model
@@ -275,7 +293,11 @@ set MPAS_GITTREE="jjguerrette"
 set MPAS_GITBRANCH=develop-for-jedi
 
 set SRCMPAS=${EXT_SRC_DIR}/${MPAS_GITREPO}
-set BLDMPAS=${EXT_BLD_DIR}/MPAS_${COMP}-${MPICOMP}_debug=${DEBUG_BUILD}
+set BLDMPAS=${EXT_BLD_DIR}/MPAS_${COMP}-${MPICOMP}_debug=${LIB_DEBUG_BUILD}
+if ( (! $?PIO  ) || ( ${custom_pio} ) ) then
+   set BLDMPAS=${BLDMPAS}_PIO-${PIO_GITBRANCH}
+endif
+
 set LIBMPAS=${BLDMPAS}/link_libs
 
 #ODB
@@ -292,7 +314,7 @@ mkdir -p ${SRC_DIR}
 mkdir -p ${BLD_DIR}
 mkdir -p ${EXT_SRC_DIR}
 
-if ( ${build_pio2} ) then
+if ( ( ${build_pio2} ) && ( ${custom_pio} ) ) then
    echo ""
    echo "======================================================"
    echo " Git clone PIO2"
@@ -300,13 +322,9 @@ if ( ${build_pio2} ) then
    cd ${EXT_SRC_DIR}
    rm -rf $SRCPIO
    git clone https://github.com/NCAR/${PIO_GITREPO}.git
-
-### MARKED FOR REMOVAL, 19 APR 2019: NOT NEEDED FOR gnu-openmpi_JCSDA
-#   # 21 DEC 2018: PIO2 master branch causes a substantial increase
-#   # in wall-time for ${BNDLNAME}-bundle.  Temporarily use old hash
-#   # until this bug is fixed.
-#   #cd $SRCPIO
-#   #git checkout -b OLD_SHA 96e562f7c8bd55b9ad50144c332516bf571a94c6
+   cd ${SRCPIO}
+   git fetch -a
+   git checkout -b ${PIO_GITBRANCH} ${PIO_GITBRANCH}
 
    echo ""
    echo "======================================================"
@@ -316,12 +334,21 @@ if ( ${build_pio2} ) then
    setenv CFLAGS "-fPIC"
    setenv FCFLAGS "-fPIC"
    setenv LDFLAGS "-fPIC"
-
    rm -rf $BLDPIO
    mkdir -p $LIBPIO
    cd $BLDPIO
    setenv CC mpicc
-   cmake -DNetCDF_C_PATH=$NETCDF -DNetCDF_Fortran_PATH=$NETCDF -DPnetCDF_PATH=$PNETCDF -DCMAKE_INSTALL_PREFIX=${LIBPIO} -DPIO_ENABLE_TIMING=OFF $SRCPIO -DPIO_ENABLE_TIMING=OFF
+   if ( $LIB_DEBUG_BUILD ) then
+      setenv PIO_CMAKE_BUILD_TYPE "Debug"
+      setenv PIO_ENABLE_LOGGING "ON"
+   else
+      setenv PIO_CMAKE_BUILD_TYPE "Release"
+      #setenv PIO_CMAKE_BUILD_TYPE "RelWithDebInfo"
+      setenv PIO_ENABLE_LOGGING "OFF"
+   endif
+
+   cmake -DCMAKE_BUILD_TYPE=${PIO_CMAKE_BUILD_TYPE} -DNetCDF_C_PATH=$NETCDF -DNetCDF_Fortran_PATH=$NETCDF -DPnetCDF_PATH=$PNETCDF -DCMAKE_INSTALL_PREFIX=${LIBPIO} -DPIO_ENABLE_TIMING=OFF $SRCPIO -DPIO_ENABLE_TIMING=OFF -DPIO_ENABLE_LOGGING=${PIO_ENABLE_LOGGING}
+
    make |& tee make.log
 
    echo ""
@@ -347,10 +374,12 @@ if ( $build_mpas ) then
    # + can only clone successfully when local clone/branch does not exist
    # Q: possible to move MPAS-Model clone/pull/build to EC build system?
    #rm -rf ${SRCMPAS}
-   git clone -b ${MPAS_GITBRANCH} https://github.com/${MPAS_GITTREE}/${MPAS_GITREPO}
+   git clone https://github.com/${MPAS_GITTREE}/${MPAS_GITREPO}
 
    #Copy index to ${BLDMPAS}
    cd ${SRCMPAS}
+   git fetch -a
+   git checkout ${MPAS_GITBRANCH}
    rm -rf ${BLDMPAS}
    mkdir -p ${BLDMPAS}
    git checkout-index -f -a --prefix=${BLDMPAS}/
@@ -366,7 +395,7 @@ if ( $build_mpas ) then
    echo "make clean CORE=atmosphere"
    make clean CORE=atmosphere
    setenv MPASDEBUG ""
-   if ( $DEBUG_BUILD ) then
+   if ( $LIB_DEBUG_BUILD ) then
       setenv MPASDEBUG "DEBUG=true"
    endif
    echo "make ${MODELFC} CORE=atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG} |& tee make.log"
@@ -426,6 +455,14 @@ if ( $build_bundle ) then
    echo " Compiling ${BNDLNAME}-bundle using ecbuild/cmake"
    echo "=============================================================="
    if ( "${BNDLNAME}" == mpas ) then
+      if ( ! -f ${LIBPIO}/lib/libpioc.a ) then
+         echo "Required PIO library file 'libpioc.a' not found in '${LIBPIO}/lib'. mpas-bundle compile aborted since it will fail."
+         exit
+      endif
+      if ( ! -f ${LIBMPAS}/libmpas.a ) then
+         echo "Required MPAS-Model library file 'libmpas.a' not found in '${LIBMPAS}'. mpas-bundle compile aborted since it will fail."
+         exit
+      endif
       setenv MPAS_LIBRARIES "${LIBPIO}/lib/libpiof.a;${LIBPIO}/lib/libpioc.a;${LIBMPAS}/libmpas.a"
 
       switch ( "$platform" )
@@ -433,7 +470,11 @@ if ( $build_bundle ) then
          setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};/usr/local/lib/libnetcdf.so;/usr/local/lib/libmpi.so;/usr/local/lib/libpnetcdf.a;/usr/local/lib/libmpi_mpifh.so"
          breaksw
       default:
-         setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};${NETCDF}/lib/libnetcdf.so;${MPI_ROOT}/lib/libmpi.so;${PNETCDF}/lib/libpnetcdf.a;${MPI_ROOT}/lib/libmpi.so"
+         if ( "$MPICOMP" == impi ) then
+            setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};${NETCDF}/lib/libnetcdf.so;${MPI_ROOT}/lib64/libmpi.so;${PNETCDF}/lib/libpnetcdf.a;${MPI_ROOT}/lib64/libmpi.so"
+         else
+            setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};${NETCDF}/lib/libnetcdf.so;${MPI_ROOT}/lib/libmpi.so;${PNETCDF}/lib/libpnetcdf.a;${MPI_ROOT}/lib/libmpi.so"
+         endif
          breaksw
       endsw
 
@@ -452,11 +493,10 @@ if ( $build_bundle ) then
       setenv LDFLAGS "-L$INTEL_BASE_PATH/lib/intel64 -L/usr/lib -lifport -lifcoremt -lipgo -lintlc"
       echo "LDFLAGS = ${LDFLAGS}"
    endif
-
-   if ( $DEBUG_BUILD ) then
-     set BLDTYPE=debug
-   else
-     set BLDTYPE=release
+   if ( ( "${COMP}" == gnu ) && ( "$platform" =~ cheyenne* ) ) then
+      # Extra flags needed for gnu-openmpi on Cheyenne
+      setenv LDFLAGS "-lgfortran -lmpi_mpifh"
+      echo "LDFLAGS = ${LDFLAGS}"
    endif
 
 #   set ODBFLAGS=""
@@ -467,7 +507,7 @@ if ( $build_bundle ) then
 
    mkdir -p ${BNDL_BLD}
    cd ${BNDL_BLD}
-   ecbuild --build=${BLDTYPE} ${BNDL_SRC} |& tee ecbuild.log0
+   ecbuild --build=${BUNDLE_BUILD_TYPE} ${BNDL_SRC} |& tee ecbuild.log0
 
    echo ""
    echo "NOTE: the preceding output from ecbuild is archived in ${BNDL_BLD}/ecbuild.log0"
@@ -489,15 +529,16 @@ if ( $build_bundle ) then
    ln -sfv ${BLDMPAS}/src/core_atmosphere/physics/physics_wrf/files/*.DBL ${BNDL_BLD}/${REPONAME}/test
 endif
 
-#===============================================
-# Create a ctest executable
-#===============================================
-#Either 'sh' or 'csh' will work
-set TESTSHELL=csh 
-set CTESTBNDL=ctest_$BNDL_BLD_NAME.$TESTSHELL
-set CTESTOUT=ctest.out
-cd ${BNDL_BLD}
-cat > $CTESTBNDL << EOF
+if ( $test_mpas ) then
+   #===============================================
+   # Create a ctest executable
+   #===============================================
+   #Either 'sh' or 'csh' will work
+   set TESTSHELL=csh 
+   set CTESTBNDL=ctest_$BNDL_BLD_NAME.$TESTSHELL
+   set CTESTOUT=ctest.out
+   cd ${BNDL_BLD}
+   cat > $CTESTBNDL << EOF
 #!/bin/$TESTSHELL
 source $BNDL_SRC/$JEDIENVFILE.$TESTSHELL
 cd $BNDL_BLD/${REPONAME}/test
@@ -518,13 +559,12 @@ ctest |& tee $CTESTOUT
 
 exit \$?
 EOF
-chmod u+x $CTESTBNDL
+   chmod u+x $CTESTBNDL
 
-echo ""; echo "Execute ${BNDL_BLD}/$CTESTBNDL to run the ctests"; echo ""
-if ( $test_mpas ) then
    echo ""
    echo "======================================================"
-   echo " Running ctests for $BNDL_BLD_NAME"
+   echo " Running ctests for ${BNDL_BLD_NAME}:"
+   echo " ${BNDL_BLD}/$CTESTBNDL"
    echo "======================================================"
    switch ( "$platform" )
    case cheyenne*:
@@ -534,8 +574,8 @@ if ( $test_mpas ) then
       cat > $CTESTBNDL.pbs << EOF
 #!/bin/$TESTSHELL
 #PBS -N ctest_$BNDL_BLD_NAME
-#PBS -l select=1:ncpus=12:mpiprocs=12
-#PBS -l walltime=0:15:00
+#PBS -l select=1:ncpus=16:mpiprocs=16
+#PBS -l walltime=0:30:00
 #PBS -q economy
 #PBS -A NMMM0015
 #PBS -M $USER@ucar.edu
