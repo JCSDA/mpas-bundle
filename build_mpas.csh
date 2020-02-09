@@ -531,6 +531,12 @@ endif
 
 if ( $test_mpas ) then
    #===============================================
+   # get ioda test data
+   #===============================================
+   cd ${BNDL_BLD}/${REPONAME}
+   ctest -VV -R get_ioda_test_data_mpas
+
+   #===============================================
    # Create a ctest executable
    #===============================================
    #Either 'sh' or 'csh' will work
@@ -544,7 +550,7 @@ source $BNDL_SRC/$JEDIENVFILE.$TESTSHELL
 cd $BNDL_BLD/${REPONAME}/test
 
 ## Run all tests
-ctest |& tee $CTESTOUT
+ctest -E get_ioda_test_data_mpas |& tee $CTESTOUT
 
 ## Select groups of tests
 #ctest -R mpas_hofx |& tee -a $CTESTOUT
