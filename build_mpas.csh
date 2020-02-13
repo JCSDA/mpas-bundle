@@ -156,7 +156,11 @@ else
 
       echo 'module purge' | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
       echo "module load jedi/$jedi_module" | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
+      if ( ${custom_pio} ) then
+         echo 'module unload pio' | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
+      endif
       echo 'module list' | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
+
 
       breaksw
    default:
@@ -471,7 +475,7 @@ if ( $build_bundle ) then
          breaksw
       default:
          if ( "$MPICOMP" == impi ) then
-            setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};${NETCDF}/lib/libnetcdf.so;${MPI_ROOT}/lib64/libmpi.so;${PNETCDF}/lib/libpnetcdf.a;${MPI_ROOT}/lib64/libmpi.so"
+            setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};${NETCDF}/lib/libnetcdf.so;${MPI_ROOT}/intel64/lib/release/libmpi.so;${PNETCDF}/lib/libpnetcdf.a"
          else
             setenv MPAS_LIBRARIES "${MPAS_LIBRARIES};${NETCDF}/lib/libnetcdf.so;${MPI_ROOT}/lib/libmpi.so;${PNETCDF}/lib/libpnetcdf.a;${MPI_ROOT}/lib/libmpi.so"
          endif
