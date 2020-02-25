@@ -114,6 +114,12 @@ if ( "$platform" =~ vagrant* ) then
    set jedi_module="none"
 
    set REL_DIR="/home/vagrant"
+
+   # Uncomment three lines below if desired when IODA test data already present
+   # Doing so will prevent the IODA data download ctest from running
+   #set PATH_TESTFILES=${REL_DIR}/build/mpas-bundle/test_data/ioda
+   #echo "setenv LOCAL_PATH_TESTFILES $PATH_TESTFILES" | tee -a $JEDIENVFILE.csh
+   #echo "export LOCAL_PATH_TESTFILES=$PATH_TESTFILES" >> $JEDIENVFILE.sh
 else
    ## HPC
 
@@ -161,7 +167,10 @@ else
       endif
       echo 'module list' | tee -a $JEDIENVFILE.csh $JEDIENVFILE.sh
 
-
+      # IODA test data pulled to Cheyenne daily from S3 via job mainained by Maryam Abdi-Oskouei
+      set PATH_TESTFILES=/glade/u/home/maryamao/s3_ioda_test_files/test_data/ioda
+      echo "setenv LOCAL_PATH_TESTFILES $PATH_TESTFILES" | tee -a $JEDIENVFILE.csh
+      echo "export LOCAL_PATH_TESTFILES=$PATH_TESTFILES" >> $JEDIENVFILE.sh
       breaksw
    default:
       echo "ERROR: platform=${platform} is not currently supported"
@@ -511,7 +520,15 @@ if ( $build_bundle ) then
 
    mkdir -p ${BNDL_BLD}
    cd ${BNDL_BLD}
-   ecbuild --build=${BUNDLE_BUILD_TYPE} ${BNDL_SRC} |& tee ecbuild.log0
+
+   if ( $?PATH_TESTFILES ) then
+     echo "using local ioda testfiles in:${PATH_TESTFILES}"
+     ecbuild --build=${BUNDLE_BUILD_TYPE} -DLOCAL_PATH_TESTFILES=${PATH_TESTFILES} ${BNDL_SRC} |& tee ecbuild.log0
+   else
+     echo "path to local ioda testfiles not provided"
+     ecbuild --build=${BUNDLE_BUILD_TYPE} ${BNDL_SRC} |& tee ecbuild.log0
+   endif
+
 
    echo ""
    echo "NOTE: the preceding output from ecbuild is archived in ${BNDL_BLD}/ecbuild.log0"
@@ -534,12 +551,13 @@ if ( $build_bundle ) then
 endif
 
 if ( $test_mpas ) then
-   #===============================================
-   # get ioda test data
-   #===============================================
-   cd ${BNDL_BLD}/${REPONAME}
-   ctest -VV -R get_ioda_test_data_mpas
-
+   if ( ! $?PATH_TESTFILES ) then
+      #===============================================
+      # get ioda test data if no path provided
+      #===============================================
+      cd ${BNDL_BLD}/${REPONAME}
+      ctest -VV -R get_ioda_test_data_mpas
+   endif
    #===============================================
    # Create a ctest executable
    #===============================================
