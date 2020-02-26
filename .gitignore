@@ -13,6 +13,7 @@
 #Ignore the contents of these directories
 eckit/
 fckit/
+atlas/
 oops/
 crtm/
 ioda/
