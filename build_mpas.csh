@@ -118,8 +118,8 @@ if ( "$platform" =~ vagrant* ) then
    # Uncomment three lines below if desired when IODA test data already present
    # Doing so will prevent the IODA data download ctest from running
    #set PATH_TESTFILES=${REL_DIR}/build/mpas-bundle/test_data/ioda
-   #echo "setenv LOCAL_PATH_TESTFILES $PATH_TESTFILES" | tee -a $JEDIENVFILE.csh
-   #echo "export LOCAL_PATH_TESTFILES=$PATH_TESTFILES" >> $JEDIENVFILE.sh
+   #echo "setenv LOCAL_PATH_TESTFILES_IODA $PATH_TESTFILES" | tee -a $JEDIENVFILE.csh
+   #echo "export LOCAL_PATH_TESTFILES_IODA=$PATH_TESTFILES" >> $JEDIENVFILE.sh
 else
    ## HPC
 
@@ -169,8 +169,8 @@ else
 
       # IODA test data pulled to Cheyenne daily from S3 via job mainained by Maryam Abdi-Oskouei
       set PATH_TESTFILES=/glade/u/home/maryamao/s3_ioda_test_files/test_data/ioda
-      echo "setenv LOCAL_PATH_TESTFILES $PATH_TESTFILES" | tee -a $JEDIENVFILE.csh
-      echo "export LOCAL_PATH_TESTFILES=$PATH_TESTFILES" >> $JEDIENVFILE.sh
+      echo "setenv LOCAL_PATH_TESTFILES_IODA $PATH_TESTFILES" | tee -a $JEDIENVFILE.csh
+      echo "export LOCAL_PATH_TESTFILES_IODA=$PATH_TESTFILES" >> $JEDIENVFILE.sh
       breaksw
    default:
       echo "ERROR: platform=${platform} is not currently supported"
@@ -523,7 +523,7 @@ if ( $build_bundle ) then
 
    if ( $?PATH_TESTFILES ) then
      echo "using local ioda testfiles in:${PATH_TESTFILES}"
-     ecbuild --build=${BUNDLE_BUILD_TYPE} -DLOCAL_PATH_TESTFILES=${PATH_TESTFILES} ${BNDL_SRC} |& tee ecbuild.log0
+     ecbuild --build=${BUNDLE_BUILD_TYPE} -DLOCAL_PATH_TESTFILES_IODA=${PATH_TESTFILES} ${BNDL_SRC} |& tee ecbuild.log0
    else
      echo "path to local ioda testfiles not provided"
      ecbuild --build=${BUNDLE_BUILD_TYPE} ${BNDL_SRC} |& tee ecbuild.log0
