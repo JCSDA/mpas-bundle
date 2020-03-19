@@ -138,6 +138,7 @@ else
 
    switch ( "$platform" )
    case cheyenne*:
+      
       #CHEYENNE - `uname -n` only works on login node
       echo "source /etc/profile.d/modules.csh" | tee -a $JEDIENVFILE.csh
       echo "source /etc/profile.d/modules.sh" >> $JEDIENVFILE.sh
@@ -548,16 +549,21 @@ if ( $build_bundle ) then
    # Link TBL and DBL lookup table files from MPAS-Model build directory
    ln -sfv ${BLDMPAS}/src/core_atmosphere/physics/physics_wrf/files/*.TBL ${BNDL_BLD}/${REPONAME}/test
    ln -sfv ${BLDMPAS}/src/core_atmosphere/physics/physics_wrf/files/*.DBL ${BNDL_BLD}/${REPONAME}/test
-endif
-
-if ( $test_mpas ) then
    if ( ! $?PATH_TESTFILES ) then
       #===============================================
       # get ioda test data if no path provided
       #===============================================
       cd ${BNDL_BLD}/${REPONAME}
-      ctest -VV -R get_ioda_test_data_mpas
+      if ( "$platform" =~ cheyenne* ) then
+         module load python
+         module load ncarenv
+         ncar_pylib
+      endif
+      ctest -VV -R mpas_get_ioda_test_data
    endif
+endif
+
+if ( $test_mpas ) then
    #===============================================
    # Create a ctest executable
    #===============================================
