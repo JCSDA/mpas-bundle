@@ -578,7 +578,7 @@ source $BNDL_SRC/$JEDIENVFILE.$TESTSHELL
 cd $BNDL_BLD/${REPONAME}/test
 
 ## Run all tests
-ctest -E get_ioda_test_data_mpas |& tee $CTESTOUT
+ctest -E mpas_get_ioda_test_data |& tee $CTESTOUT
 
 ## Select groups of tests
 #ctest -R mpas_hofx |& tee -a $CTESTOUT
