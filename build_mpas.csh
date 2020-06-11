@@ -74,8 +74,11 @@ set MPICOMP="openmpi"
 #Select 'Release' for greatest bundle build optimization [ Debug (D); RelWithDebInfo; Release ]
 set BUNDLE_BUILD_TYPE=Debug
 
-#Set to 1 to turn on debug build for MPAS-Model and PIO
-set LIB_DEBUG_BUILD=0
+#Set to 1 to turn on debug build for MPAS-Model
+set MPAS_LIB_DEBUG_BUILD=0
+
+#Set to 1 to turn on debug build for PIO
+set PIO_LIB_DEBUG_BUILD=0
 
 #Set BNDLNAME (mpas, unless used to build another jedi bundle)
 set BNDLNAME="mpas"
@@ -286,8 +289,8 @@ set EXT_BLD_DIR=${REL_DIR}/libs/build
 #PIO
 set PIO_GITREPO="ParallelIO"
 set SRCPIO=${EXT_SRC_DIR}/${PIO_GITREPO}
-set BLDPIO=${EXT_BLD_DIR}/PIO_${COMP}-${MPICOMP}_debug=${LIB_DEBUG_BUILD}
-set PIO_GITBRANCH=master
+set PIO_GITBRANCH=pio2_5_0
+set BLDPIO=${EXT_BLD_DIR}/${PIO_GITBRANCH}_${COMP}-${MPICOMP}_debug=${PIO_LIB_DEBUG_BUILD}
 if ( (! $?PIO  ) || ( ${custom_pio} ) ) then
    set LIBPIO=${BLDPIO}/writable/pio2
 else
@@ -307,9 +310,9 @@ set MPAS_GITTREE="jjguerrette"
 set MPAS_GITBRANCH=develop-for-jedi
 
 set SRCMPAS=${EXT_SRC_DIR}/${MPAS_GITREPO}
-set BLDMPAS=${EXT_BLD_DIR}/MPAS_${COMP}-${MPICOMP}_debug=${LIB_DEBUG_BUILD}
+set BLDMPAS=${EXT_BLD_DIR}/MPAS_${COMP}-${MPICOMP}_debug=${MPAS_LIB_DEBUG_BUILD}
 if ( (! $?PIO  ) || ( ${custom_pio} ) ) then
-   set BLDMPAS=${BLDMPAS}_PIO-${PIO_GITBRANCH}
+   set BLDMPAS=${BLDMPAS}_${PIO_GITBRANCH}_debug=${PIO_LIB_DEBUG_BUILD}
 endif
 
 set LIBMPAS=${BLDMPAS}/link_libs
@@ -352,9 +355,10 @@ if ( ( ${build_pio2} ) && ( ${custom_pio} ) ) then
    mkdir -p $LIBPIO
    cd $BLDPIO
    setenv CC mpicc
-   if ( $LIB_DEBUG_BUILD ) then
+   if ( $PIO_LIB_DEBUG_BUILD ) then
       setenv PIO_CMAKE_BUILD_TYPE "Debug"
-      setenv PIO_ENABLE_LOGGING "ON"
+      #TODO: Figure out how to get PIO logging to work. Until then we may as well keep it turned off.
+      setenv PIO_ENABLE_LOGGING "OFF"
    else
       setenv PIO_CMAKE_BUILD_TYPE "Release"
       #setenv PIO_CMAKE_BUILD_TYPE "RelWithDebInfo"
@@ -409,7 +413,7 @@ if ( $build_mpas ) then
    echo "make clean CORE=atmosphere"
    make clean CORE=atmosphere
    setenv MPASDEBUG ""
-   if ( $LIB_DEBUG_BUILD ) then
+   if ( $MPAS_LIB_DEBUG_BUILD ) then
       setenv MPASDEBUG "DEBUG=true"
    endif
    echo "make ${MODELFC} CORE=atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG} |& tee make.log"
