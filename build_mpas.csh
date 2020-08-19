@@ -416,6 +416,9 @@ if ( $build_mpas ) then
    if ( $MPAS_LIB_DEBUG_BUILD ) then
       setenv MPASDEBUG "DEBUG=true"
    endif
+   echo "make ${MODELFC} CORE=init_atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG} |& tee make.log"
+   make ${MODELFC} CORE=init_atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG} |& tee make.log
+   make clean CORE=atmosphere
    echo "make ${MODELFC} CORE=atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG} |& tee make.log"
    make ${MODELFC} CORE=atmosphere USE_PIO2=true SHARELIB=true ${MPASDEBUG} |& tee make.log
 
