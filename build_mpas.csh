@@ -71,8 +71,8 @@ set COMP="gnu"
 #Select MPICOMP for HPC platforms [ openmpi (D); mpt; impi ]
 set MPICOMP="openmpi"
 
-#Select 'Release' for greatest bundle build optimization [ Debug (D); RelWithDebInfo; Release ]
-set BUNDLE_BUILD_TYPE=Debug
+#Select 'Release' for greatest bundle build optimization [ Debug; RelWithDebInfo; Release (D) ]
+set BUNDLE_BUILD_TYPE=Release
 
 #Set to 1 to turn on debug build for MPAS-Model
 set MPAS_LIB_DEBUG_BUILD=0
