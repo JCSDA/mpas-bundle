@@ -11,16 +11,18 @@
 *~
 
 #Ignore the contents of these directories
+jedicmake/
 eckit/
 fckit/
 atlas/
 oops/
+ropp-ufo/
+gsw/
 crtm/
 ioda/
 ufo/
-mpas-jedi/
-gsw/
-ropp-ufo/
+mpasjedi/
+MPAS-Model/
 saber/
 
 #Ignore JEDIENV files
