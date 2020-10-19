@@ -28,7 +28,8 @@ ecbuild_bundle( PROJECT eckit     GIT "https://github.com/jcsda-internal/eckit.g
 ecbuild_bundle( PROJECT fckit     GIT "https://github.com/jcsda-internal/fckit.git"  BRANCH release-stable  UPDATE )
 ecbuild_bundle( PROJECT atlas     GIT "https://github.com/jcsda-internal/atlas.git"  BRANCH release-stable  UPDATE )
 
-option(BUNDLE_SKIP_ROPP-UFO "Don't build ROPP-UFO"  "ON") # Skip ropp-ufo build unless user passes -DBUNDLE_SKIP_ROPP-UFO=OFF
+#TODO: When mpas-bundle becomes a public repo, consider changing the default value of BUNDLE_SKIP_ROPP-UFO to "ON"
+option(BUNDLE_SKIP_ROPP-UFO "Don't build ROPP-UFO"  "OFF") # Skip ropp-ufo build unless user passes -DBUNDLE_SKIP_ROPP-UFO=OFF
 ecbuild_bundle( PROJECT ropp-ufo  GIT "https://github.com/jcsda-internal/ropp-test.git"   BRANCH feature/cmake  UPDATE )
 option(BUNDLE_SKIP_GSW "Don't build GSW"       "ON") # Skip gsw build unless user passes -DBUNDLE_SKIP_GSW=OFF
 ecbuild_bundle( PROJECT gsw       GIT "https://github.com/jcsda-internal/GSW-Fortran.git" BRANCH develop  UPDATE )
