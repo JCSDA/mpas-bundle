@@ -33,7 +33,7 @@ option(BUNDLE_SKIP_ROPP-UFO "Don't build ROPP-UFO"  "OFF") # Skip ropp-ufo build
 ecbuild_bundle( PROJECT ropp-ufo  GIT "https://github.com/jcsda-internal/ropp-test.git"   BRANCH feature/cmake  UPDATE )
 option(BUNDLE_SKIP_GSW "Don't build GSW"       "ON") # Skip gsw build unless user passes -DBUNDLE_SKIP_GSW=OFF
 ecbuild_bundle( PROJECT gsw       GIT "https://github.com/jcsda-internal/GSW-Fortran.git" BRANCH develop  UPDATE )
-ecbuild_bundle( PROJECT crtm      GIT "https://github.com/jcsda-internal/crtm-old.git"    BRANCH develop  UPDATE )
+ecbuild_bundle( PROJECT crtm      GIT "https://github.com/jcsda-internal/crtm.git"        TAG    v2.3-jedi  UPDATE )
 
 ecbuild_bundle( PROJECT oops      GIT "https://github.com/jcsda-internal/oops.git"        BRANCH develop  UPDATE )
 ecbuild_bundle( PROJECT saber     GIT "https://github.com/jcsda-internal/saber.git"       BRANCH develop  UPDATE )

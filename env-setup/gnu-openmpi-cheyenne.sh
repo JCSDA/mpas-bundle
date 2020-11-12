@@ -3,7 +3,7 @@ export OPT=/glade/work/miesch/modules
 module use $OPT/modulefiles/core
 module purge
 module load jedi/gnu-openmpi
-export LOCAL_PATH_TESTFILES_IODA=/glade/u/home/maryamao/s3_ioda_test_files/test_data/ioda
+export LOCAL_PATH_JEDI_TESTFILES=/glade/u/home/maryamao/JEDI_test_files
 git lfs install
 ulimit -s unlimited
 export OOPS_TRACE=1
