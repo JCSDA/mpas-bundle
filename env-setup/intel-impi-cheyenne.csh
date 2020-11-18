@@ -8,3 +8,4 @@ git lfs install
 limit stacksize unlimited
 setenv OOPS_TRACE 0  # Note: Some ctests fail when OOPS_TRACE=1
 module list
+#setenv F_UFMTENDIAN 'big:101-200'
