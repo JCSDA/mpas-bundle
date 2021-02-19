@@ -42,7 +42,7 @@ ecbuild_bundle( PROJECT saber     GIT "https://github.com/jcsda-internal/saber.g
 ecbuild_bundle( PROJECT ioda      GIT "https://github.com/jcsda-internal/ioda.git"        BRANCH develop  UPDATE )
 ecbuild_bundle( PROJECT ufo       GIT "https://github.com/jcsda-internal/ufo.git"         BRANCH develop  UPDATE )
 
-set(MPAS_CORES atmosphere init_atmosphere CACHE STRING "MPAS-Model: cores to build.")
+set(MPAS_CORES atmosphere CACHE STRING "MPAS-Model: cores to build.")
 set(MPAS_DOUBLE_PRECISION "ON" CACHE STRING "MPAS-Model: Use double precision 64-bit Floating point.")
 ecbuild_bundle( PROJECT MPAS-Model GIT "https://github.com/jcsda-internal/MPAS-Model.git" BRANCH release-stable UPDATE)
 ecbuild_bundle( PROJECT mpasjedi GIT "https://github.com/jcsda-internal/mpas-jedi"  BRANCH develop UPDATE)
