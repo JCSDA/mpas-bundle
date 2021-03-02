@@ -34,7 +34,7 @@ ecbuild_bundle( PROJECT ropp-ufo  GIT "https://github.com/jcsda-internal/ropp-te
 option(BUNDLE_SKIP_GSW "Don't build GSW"       "ON") # Skip gsw build unless user passes -DBUNDLE_SKIP_GSW=OFF
 ecbuild_bundle( PROJECT gsw       GIT "https://github.com/jcsda-internal/GSW-Fortran.git" BRANCH develop  UPDATE )
 ecbuild_bundle( PROJECT crtm      GIT "https://github.com/jcsda-internal/crtm.git"        TAG    v2.3-jedi  UPDATE )
-option(BUNDLE_SKIP_RTTOV "Don't build rttov"  "OFF") # Skip rttov build unless user passes -DBUNDLE_SKIP_RTTOV=OFF
+option(BUNDLE_SKIP_RTTOV "Don't build rttov"  "ON") # Skip rttov build unless user passes -DBUNDLE_SKIP_RTTOV=OFF
 ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA-internal/rttov.git"       BRANCH develop UPDATE )
 
 ecbuild_bundle( PROJECT oops      GIT "https://github.com/jcsda-internal/oops.git"        BRANCH develop  UPDATE )
