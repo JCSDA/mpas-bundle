@@ -22,7 +22,7 @@ crtm/
 ioda/
 ufo/
 mpasjedi/
-MPAS-Model/
+MPAS/
 saber/
 
 #Ignore JEDIENV files
