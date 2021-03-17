@@ -11,20 +11,17 @@
 *~
 
 #Ignore the contents of these directories
-jedicmake/
+atlas/
+crtm/
 eckit/
 fckit/
-atlas/
+gsw/
+ioda/
+jedicmake/
+MPAS/
+mpasjedi/
 oops/
 ropp-ufo/
-gsw/
-crtm/
-ioda/
-ufo/
-mpasjedi/
-MPAS/
+rttov/
 saber/
-
-#Ignore JEDIENV files
-JEDIENV*
-
+ufo/
