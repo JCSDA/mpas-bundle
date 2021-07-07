@@ -71,7 +71,7 @@ endif()
 
 # If UFO's current branch is available in ioda-data repo, that branch will be checked out
 branch_checkout (REPO_DIR_NAME ufo-data
-                 BRANCH ${GIT_BRANCH_FUNC} 
+                 BRANCH ${GIT_BRANCH_FUNC})
 
 set(MPAS_DOUBLE_PRECISION "ON" CACHE STRING "MPAS-Model: Use double precision 64-bit Floating point.")
 set(MPAS_CORES init_atmosphere atmosphere CACHE STRING "MPAS-Model: cores to build.")
