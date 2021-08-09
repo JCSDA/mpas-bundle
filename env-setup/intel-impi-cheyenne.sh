@@ -1,7 +1,7 @@
 source /etc/profile.d/modules.sh
-export OPT=/glade/work/miesch/modules
-module use $OPT/modulefiles/core
+export OPT=/glade/work/jedipara/cheyenne/opt/modules
 module purge
+module use $OPT/modulefiles/core
 module load jedi/intel-impi
 unalias ecbuild
 ecb=`which ecbuild`
