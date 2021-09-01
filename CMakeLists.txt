@@ -73,10 +73,32 @@ endif()
 branch_checkout (REPO_DIR_NAME ufo-data
                  BRANCH ${GIT_BRANCH_FUNC})
 
+
+# same procedure for saber-data
+find_branch_name(REPO_DIR_NAME saber)
+if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
+  ecbuild_bundle( PROJECT saber-data GIT "https://github.com/JCSDA-internal/saber-data.git" BRANCH develop UPDATE )
+endif()
+
+# If saber's current branch is available in saber-data repo, that branch will be checked out
+branch_checkout (REPO_DIR_NAME saber-data
+                 BRANCH ${GIT_BRANCH_FUNC} )
+
+
 set(MPAS_DOUBLE_PRECISION "ON" CACHE STRING "MPAS-Model: Use double precision 64-bit Floating point.")
 set(MPAS_CORES init_atmosphere atmosphere CACHE STRING "MPAS-Model: cores to build.")
 ecbuild_bundle( PROJECT MPAS GIT "https://github.com/jcsda-internal/MPAS-Model.git" BRANCH release-stable UPDATE)
-ecbuild_bundle( PROJECT mpasjedi GIT "https://github.com/jcsda-internal/mpas-jedi"  BRANCH develop UPDATE)
+ecbuild_bundle( PROJECT mpas-jedi GIT "https://github.com/jcsda-internal/mpas-jedi"  BRANCH develop UPDATE)
+
+# same procedure for mpas-jedi-data
+find_branch_name(REPO_DIR_NAME mpas-jedi)
+if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
+  ecbuild_bundle( PROJECT mpas-jedi-data GIT "https://github.com/JCSDA-internal/mpas-jedi-data.git" BRANCH develop UPDATE )
+endif()
+
+# If mpas-jedi's current branch is available in mpas-jedi-data repo, that branch will be checked out
+branch_checkout (REPO_DIR_NAME mpas-jedi-data
+                 BRANCH ${GIT_BRANCH_FUNC} )
 
 
 ecbuild_bundle_finalize()

@@ -18,7 +18,8 @@ fckit/
 ioda/
 jedicmake/
 MPAS/
-mpasjedi/
+mpas-jedi/
+mpas-jedi-data/
 oops/
 ropp-ufo/
 rttov/
@@ -27,3 +28,4 @@ ufo/
 ioda-data/
 ufo-data/
 test-data-release/
+build/
