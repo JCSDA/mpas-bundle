@@ -16,6 +16,7 @@ crtm/
 eckit/
 fckit/
 ioda/
+ioda-data/
 jedicmake/
 MPAS/
 mpas-jedi/
@@ -24,8 +25,8 @@ oops/
 ropp-ufo/
 rttov/
 saber/
+saber-data/
 ufo/
-ioda-data/
 ufo-data/
 test-data-release/
 build/

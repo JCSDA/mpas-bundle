@@ -36,9 +36,9 @@ option(BUNDLE_SKIP_RTTOV "Don't build rttov"  "ON") # Skip rttov build unless us
 ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA-internal/rttov.git" BRANCH develop UPDATE ) # LATED TAG
 
 ecbuild_bundle( PROJECT oops      GIT "https://github.com/jcsda-internal/oops.git"        BRANCH release/mpas-1.0 UPDATE ) # to add TAG
-ecbuild_bundle( PROJECT saber     GIT "https://github.com/jcsda-internal/saber.git"       BRANCH release/mpas-1.0 UPDATE)
+ecbuild_bundle( PROJECT saber     GIT "https://github.com/jcsda-internal/saber.git"       BRANCH release/mpas-1.0 UPDATE )
 ecbuild_bundle( PROJECT ioda      GIT "https://github.com/jcsda-internal/ioda.git"        BRANCH release/mpas-1.0 UPDATE )
-ecbuild_bundle( PROJECT ufo       GIT "https://github.com/jcsda-internal/ufo.git"         BRANCH release/mpas-1.0 UPDATE)
+ecbuild_bundle( PROJECT ufo       GIT "https://github.com/jcsda-internal/ufo.git"         BRANCH release/mpas-1.0 UPDATE )
 
 # ioda and ufo test data
 #---------------------------------
@@ -52,35 +52,31 @@ ecbuild_bundle( PROJECT ufo       GIT "https://github.com/jcsda-internal/ufo.git
 find_branch_name(REPO_DIR_NAME ioda)
 # When LOCAL_PATH_JEDI_TESTFILES is set to the directory of IODA test files stored
 # in a local directory, ioda-data repo will not be cloned
-if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
+if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED GIT_TAG_FUNC )
   ecbuild_bundle( PROJECT ioda-data GIT "https://github.com/JCSDA-internal/ioda-data.git" BRANCH release/mpas-1.0  UPDATE )
+  # If IODA's current branch is available in ioda-data repo, that branch will be checked out
+  branch_checkout (REPO_DIR_NAME ioda-data
+                   BRANCH ${GIT_BRANCH_FUNC} )
 endif()
 
-# If IODA's current branch is available in ioda-data repo, that branch will be checked out
-branch_checkout (REPO_DIR_NAME ioda-data
-                 BRANCH ${GIT_BRANCH_FUNC} )
 
 # same procedure for ufo-data
 find_branch_name(REPO_DIR_NAME ufo)
-if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
+if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED GIT_TAG_FUNC )
   ecbuild_bundle( PROJECT ufo-data GIT "https://github.com/JCSDA-internal/ufo-data.git" BRANCH release/mpas-1.0 UPDATE )
+  # If UFO's current branch is available in ioda-data repo, that branch will be checked out
+  branch_checkout (REPO_DIR_NAME ufo-data
+                   BRANCH ${GIT_BRANCH_FUNC})
 endif()
-
-# If UFO's current branch is available in ioda-data repo, that branch will be checked out
-branch_checkout (REPO_DIR_NAME ufo-data
-                 BRANCH ${GIT_BRANCH_FUNC})
-
 
 # same procedure for saber-data
 find_branch_name(REPO_DIR_NAME saber)
-if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
+if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED GIT_TAG_FUNC )
   ecbuild_bundle( PROJECT saber-data GIT "https://github.com/JCSDA-internal/saber-data.git" BRANCH release/mpas-1.0 UPDATE )
+  # If saber's current branch is available in saber-data repo, that branch will be checked out
+  branch_checkout (REPO_DIR_NAME saber-data
+                   BRANCH ${GIT_BRANCH_FUNC} )
 endif()
-
-# If saber's current branch is available in saber-data repo, that branch will be checked out
-branch_checkout (REPO_DIR_NAME saber-data
-                 BRANCH ${GIT_BRANCH_FUNC} )
-
 
 set(MPAS_DOUBLE_PRECISION "ON" CACHE STRING "MPAS-Model: Use double precision 64-bit Floating point.")
 set(MPAS_CORES init_atmosphere atmosphere CACHE STRING "MPAS-Model: cores to build.")
@@ -89,13 +85,14 @@ ecbuild_bundle( PROJECT mpas-jedi GIT "https://github.com/jcsda-internal/mpas-je
 
 # same procedure for mpas-jedi-data
 find_branch_name(REPO_DIR_NAME mpas-jedi)
-if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
+if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED GIT_TAG_FUNC )
   ecbuild_bundle( PROJECT mpas-jedi-data GIT "https://github.com/JCSDA-internal/mpas-jedi-data.git" BRANCH release/mpas-1.0 UPDATE )
+  # If mpas-jedi's current branch is available in mpas-jedi-data repo, that branch will be checked out
+  branch_checkout (REPO_DIR_NAME mpas-jedi-data
+                   BRANCH ${GIT_BRANCH_FUNC} )
 endif()
 
-# If mpas-jedi's current branch is available in mpas-jedi-data repo, that branch will be checked out
-branch_checkout (REPO_DIR_NAME mpas-jedi-data
-                 BRANCH ${GIT_BRANCH_FUNC} )
+
 
 
 ecbuild_bundle_finalize()
