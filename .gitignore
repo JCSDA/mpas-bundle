@@ -11,11 +11,22 @@
 *~
 
 #Ignore the contents of these directories
+atlas/
+crtm/
 eckit/
 fckit/
-oops/
-crtm/
 ioda/
+ioda-data/
+jedicmake/
+MPAS/
+mpas-jedi/
+mpas-jedi-data/
+oops/
+ropp-ufo/
+rttov/
+saber/
+saber-data/
 ufo/
-mpas/
-
+ufo-data/
+test-data-release/
+build/

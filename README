@@ -1,32 +1,15 @@
-(C) Copyright 2017 UCAR
+(C) Copyright 2017-2021 UCAR
 
 This software is licensed under the terms of the Apache Licence Version 2.0
 which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
-# MPAS-Bundle specific Instruction (4/5/2018)
---- Building the MPAS/JEDI bundle in Singularity environment ---
-    cd /some/where/to/store/soure/code  or  /home/vagrant as a default
-    git clone -b develop https://github.com/JCSDA/mpas-bundle.git
-
-    modify and excute ./mpas-bundle/build_mpas.csh file
-         This script contains all the build.
-         Modify REL_DIR as /some/where/to/store/soure/code or default
-         Set the variables below as 1 (do) or 0(skip)
-             set comp_pio2=1     # Get and build a PIO2 library
-             set comp_mpas=1     # Get and build MPAS model
-             set libr_mpas=1     # Make a MPAS library to be used in MPAS/OOPS
-             set oops_mpas=1     # clone and build a mpas-bundle
-             set get_data=1      # Download and place test dataset, link UFO data
-             set test_mpas=1     # launch a ctest
-         Note: Above steps are all required at least once (in order).
-               Main step to build a mpas-bundle is "set oops_mpas=1".
-
- 
-# General Instruction 
-#--- Building the MPAS/JEDI bundle ---
+#--- Building the mpas-jedi bundle ---
 #
 #    cd /somewhere/to/store/source/code
-#    git clone https://github.com/JCSDA/mpas-bundle.git
+#    git clone https://github.com/JCSDA-internal/mpas-bundle.git
+#
+#    # (If building on Cheyenne)
+#    source mpas-bundle/env-setup/<desired compiler-mpi script>
 #
 #    cd /somewhere/to/build
 #    ecbuild /somewhere/to/store/source/code/mpas-bundle
@@ -35,15 +18,20 @@ which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 The ecbuild command above will clone all the source code for the projects defined in the
 CMakeLists.txt in the bundle and the make command will build them all.
 
+The default build-type is 'release'. For a debug build, add '--build=debug' to the ecbuild
+command line.
+
 To work with a different branch than the default for a given project, the branch must be
 modified in the CMakeLists.txt for the bundle.
 
 Note: ecbuild accepts all cmake flags, for example, compilers can be selected with:
     ecbuild -DCMAKE_CXX_COMPILER=/path/to/gcc-7.2/bin/g++ ${SRC}
 
-For testing (from build directory):
+To run the mpas-jedi ctests (from build directory):
 
+    cd mpasjedi
     ctest
+
 
 --- Working with the code ---
 
@@ -52,14 +40,15 @@ in the bundle and the branch to be used. The branch specified in the CMakeLists.
 the one that will be compiled. When working with you own branch, the should be changed in
 the CMakeLists.txt file but it is not necessary to re-run ecbuild, make is enough.
 
-After the fisrt build, changes in the code can be tested by re-running only
+After the first build, changes in the code can be tested by re-running only
 (from build directory):
 
     make -j4
+    cd mpasjedi
     ctest
 
 By default, make will not update your local repository from the remote. To update all repositories
-in the bundle, run:
+in the bundle, run (from build directory):
 
     make update
 
