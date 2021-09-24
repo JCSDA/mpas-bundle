@@ -1,4 +1,4 @@
-# (C) Copyright 2017-2020 UCAR
+# (C) Copyright 2017-2021 UCAR
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -31,68 +31,19 @@ ecbuild_bundle( PROJECT eckit     GIT "https://github.com/ecmwf/eckit.git" TAG 1
 ecbuild_bundle( PROJECT fckit     GIT "https://github.com/ecmwf/fckit.git" TAG 0.9.2 )
 ecbuild_bundle( PROJECT atlas     GIT "https://github.com/ecmwf/atlas.git" TAG 0.24.1 )
 
-ecbuild_bundle( PROJECT crtm      GIT "https://github.com/jcsda-internal/crtm.git"   TAG v2.3-jedi.2 )
+ecbuild_bundle( PROJECT crtm      GIT "https://github.com/jcsda-internal/crtm.git"   TAG v2.3-jedi.3 )
 option(BUNDLE_SKIP_RTTOV "Don't build rttov"  "ON") # Skip rttov build unless user passes -DBUNDLE_SKIP_RTTOV=OFF
-ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA-internal/rttov.git" BRANCH develop UPDATE ) # LATED TAG
+ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA-internal/rttov.git" BRANCH develop UPDATE ) 
 
-ecbuild_bundle( PROJECT oops      GIT "https://github.com/jcsda-internal/oops.git"        BRANCH release/mpas-1.0 UPDATE ) # to add TAG
-ecbuild_bundle( PROJECT saber     GIT "https://github.com/jcsda-internal/saber.git"       BRANCH release/mpas-1.0 UPDATE )
-ecbuild_bundle( PROJECT ioda      GIT "https://github.com/jcsda-internal/ioda.git"        BRANCH release/mpas-1.0 UPDATE )
-ecbuild_bundle( PROJECT ufo       GIT "https://github.com/jcsda-internal/ufo.git"         BRANCH release/mpas-1.0 UPDATE )
-
-# ioda and ufo test data
-#---------------------------------
-
-# If IODA branch is being built set GIT_BRANCH_FUNC to IODA's current branch.
-# If a tagged version of IODA is being built set GIT_TAG_FUNC to ioda's current tag. In this case,
-# IODA test files will be download from UCAR DASH and ioda-data repo will not be cloned.
-# When LOCAL_PATH_JEDI_TESTFILES is set to the directory of IODA test files stored
-# in a local directory, ioda-data repo will not be cloned
-
-find_branch_name(REPO_DIR_NAME ioda)
-# When LOCAL_PATH_JEDI_TESTFILES is set to the directory of IODA test files stored
-# in a local directory, ioda-data repo will not be cloned
-if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED GIT_TAG_FUNC )
-  ecbuild_bundle( PROJECT ioda-data GIT "https://github.com/JCSDA-internal/ioda-data.git" BRANCH release/mpas-1.0  UPDATE )
-  # If IODA's current branch is available in ioda-data repo, that branch will be checked out
-  branch_checkout (REPO_DIR_NAME ioda-data
-                   BRANCH ${GIT_BRANCH_FUNC} )
-endif()
-
-
-# same procedure for ufo-data
-find_branch_name(REPO_DIR_NAME ufo)
-if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED GIT_TAG_FUNC )
-  ecbuild_bundle( PROJECT ufo-data GIT "https://github.com/JCSDA-internal/ufo-data.git" BRANCH release/mpas-1.0 UPDATE )
-  # If UFO's current branch is available in ioda-data repo, that branch will be checked out
-  branch_checkout (REPO_DIR_NAME ufo-data
-                   BRANCH ${GIT_BRANCH_FUNC})
-endif()
-
-# same procedure for saber-data
-find_branch_name(REPO_DIR_NAME saber)
-if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED GIT_TAG_FUNC )
-  ecbuild_bundle( PROJECT saber-data GIT "https://github.com/JCSDA-internal/saber-data.git" BRANCH release/mpas-1.0 UPDATE )
-  # If saber's current branch is available in saber-data repo, that branch will be checked out
-  branch_checkout (REPO_DIR_NAME saber-data
-                   BRANCH ${GIT_BRANCH_FUNC} )
-endif()
+ecbuild_bundle( PROJECT oops      GIT "https://github.com/jcsda-internal/oops.git"   TAG 1.2.0 )
+ecbuild_bundle( PROJECT saber     GIT "https://github.com/jcsda-internal/saber.git"  TAG 1.2.0 )
+ecbuild_bundle( PROJECT ioda      GIT "https://github.com/jcsda-internal/ioda.git"   TAG 2.1.0 )
+ecbuild_bundle( PROJECT ufo       GIT "https://github.com/jcsda-internal/ufo.git"    TAG 1.2.0 )
 
 set(MPAS_DOUBLE_PRECISION "ON" CACHE STRING "MPAS-Model: Use double precision 64-bit Floating point.")
 set(MPAS_CORES init_atmosphere atmosphere CACHE STRING "MPAS-Model: cores to build.")
-ecbuild_bundle( PROJECT MPAS GIT "https://github.com/jcsda/MPAS-Model.git" BRANCH release/mpas-1.0 UPDATE)
-ecbuild_bundle( PROJECT mpas-jedi GIT "https://github.com/jcsda-internal/mpas-jedi"  BRANCH release/mpas-1.0 UPDATE)
-
-# same procedure for mpas-jedi-data
-find_branch_name(REPO_DIR_NAME mpas-jedi)
-if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED GIT_TAG_FUNC )
-  ecbuild_bundle( PROJECT mpas-jedi-data GIT "https://github.com/JCSDA-internal/mpas-jedi-data.git" BRANCH release/mpas-1.0 UPDATE )
-  # If mpas-jedi's current branch is available in mpas-jedi-data repo, that branch will be checked out
-  branch_checkout (REPO_DIR_NAME mpas-jedi-data
-                   BRANCH ${GIT_BRANCH_FUNC} )
-endif()
-
-
+ecbuild_bundle( PROJECT MPAS GIT "https://github.com/jcsda/MPAS-Model.git"           TAG v7.0.jcsda2 )
+ecbuild_bundle( PROJECT mpas-jedi GIT "https://github.com/jcsda-internal/mpas-jedi"  TAG 1.0.0 )
 
 
 ecbuild_bundle_finalize()
