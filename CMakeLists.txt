@@ -21,7 +21,7 @@ find_package( ecbuild 3.5 REQUIRED HINTS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CUR
 include( ecbuild_bundle )
 ecbuild_bundle_initialize()
 
-ecbuild_bundle( PROJECT jedicmake GIT "https://github.com/jcsda-internal/jedi-cmake.git" BRANCH release/mpas-1.0 UPDATE )
+ecbuild_bundle( PROJECT jedicmake GIT "https://github.com/JCSDA/jedi-cmake.git" BRANCH release/mpas-1.0 UPDATE )
 include( jedicmake/cmake/Functions/git_functions.cmake )
 
 option(BUNDLE_SKIP_ECKIT "Don't build eckit" "ON" ) # Skip eckit build unless user passes -DBUNDLE_SKIP_ECKIT=OFF
@@ -31,19 +31,19 @@ ecbuild_bundle( PROJECT eckit     GIT "https://github.com/ecmwf/eckit.git" TAG 1
 ecbuild_bundle( PROJECT fckit     GIT "https://github.com/ecmwf/fckit.git" TAG 0.9.2 )
 ecbuild_bundle( PROJECT atlas     GIT "https://github.com/ecmwf/atlas.git" TAG 0.24.1 )
 
-ecbuild_bundle( PROJECT crtm      GIT "https://github.com/jcsda-internal/crtm.git"   TAG v2.3-jedi.3 )
+ecbuild_bundle( PROJECT crtm      GIT "https://github.com/JCSDA/crtm.git"   TAG v2.3-jedi.3 )
 option(BUNDLE_SKIP_RTTOV "Don't build rttov"  "ON") # Skip rttov build unless user passes -DBUNDLE_SKIP_RTTOV=OFF
-ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA-internal/rttov.git" BRANCH develop UPDATE ) 
+ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA/rttov.git" BRANCH develop UPDATE ) 
 
-ecbuild_bundle( PROJECT oops      GIT "https://github.com/jcsda-internal/oops.git"   TAG 1.2.0 )
-ecbuild_bundle( PROJECT saber     GIT "https://github.com/jcsda-internal/saber.git"  TAG 1.2.0 )
-ecbuild_bundle( PROJECT ioda      GIT "https://github.com/jcsda-internal/ioda.git"   TAG 2.1.0 )
-ecbuild_bundle( PROJECT ufo       GIT "https://github.com/jcsda-internal/ufo.git"    TAG 1.2.0 )
+ecbuild_bundle( PROJECT oops      GIT "https://github.com/JCSDA/oops.git"   TAG 1.2.0 )
+ecbuild_bundle( PROJECT saber     GIT "https://github.com/JCSDA/saber.git"  TAG 1.2.0 )
+ecbuild_bundle( PROJECT ioda      GIT "https://github.com/JCSDA/ioda.git"   TAG 2.1.0 )
+ecbuild_bundle( PROJECT ufo       GIT "https://github.com/JCSDA/ufo.git"    TAG 1.2.0 )
 
 set(MPAS_DOUBLE_PRECISION "ON" CACHE STRING "MPAS-Model: Use double precision 64-bit Floating point.")
 set(MPAS_CORES init_atmosphere atmosphere CACHE STRING "MPAS-Model: cores to build.")
-ecbuild_bundle( PROJECT MPAS GIT "https://github.com/jcsda/MPAS-Model.git"           TAG v7.0.jcsda2 )
-ecbuild_bundle( PROJECT mpas-jedi GIT "https://github.com/jcsda-internal/mpas-jedi"  TAG 1.0.0 )
+ecbuild_bundle( PROJECT MPAS GIT "https://github.com/JCSDA/MPAS-Model.git"           TAG v7.0.jcsda2 )
+ecbuild_bundle( PROJECT mpas-jedi GIT "https://github.com/JCSDA/mpas-jedi"  TAG 1.0.0 )
 
 
 ecbuild_bundle_finalize()
