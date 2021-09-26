@@ -29,7 +29,7 @@ Note: ecbuild accepts all cmake flags, for example, compilers can be selected wi
 
 To run the mpas-jedi ctests (from build directory):
 
-    cd mpasjedi
+    cd mpas-jedi
     ctest
 
 
@@ -44,7 +44,7 @@ After the first build, changes in the code can be tested by re-running only
 (from build directory):
 
     make -j4
-    cd mpasjedi
+    cd mpas-jedi
     ctest
 
 By default, make will not update your local repository from the remote. To update all repositories
