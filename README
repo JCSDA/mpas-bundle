@@ -6,7 +6,7 @@ which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 #--- Building the mpas-jedi bundle ---
 #
 #    cd /somewhere/to/store/source/code
-#    git clone https://github.com/JCSDA-internal/mpas-bundle.git
+#    git clone https://github.com/JCSDA/mpas-bundle.git
 #
 #    # (If building on Cheyenne)
 #    source mpas-bundle/env-setup/<desired compiler-mpi script>
