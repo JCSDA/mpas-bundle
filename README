@@ -1,12 +1,15 @@
-(C) Copyright 2017-2021 UCAR
+(C) Copyright 2017-2022 UCAR
 
 This software is licensed under the terms of the Apache Licence Version 2.0
 which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 #--- Building the mpas-jedi bundle ---
+#    Assume you have the jed-stack build environment installed in your computer.
+#    https://github.com/JCSDA/jedi-stack (clone and then checkout the develop branch)
 #
 #    cd /somewhere/to/store/source/code
-#    git clone https://github.com/JCSDA-internal/mpas-bundle.git
+#    git clone https://github.com/JCSDA/mpas-bundle.git
+#    cd mpas-bundle; git checkout release-2.0.0-beta
 #
 #    # (If building on Cheyenne)
 #    source mpas-bundle/env-setup/<desired compiler-mpi script>
@@ -17,43 +20,15 @@ which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 The ecbuild command above will clone all the source code for the projects defined in the
 CMakeLists.txt in the bundle and the make command will build them all.
+The CMakeLists.txt file in this directory contains the list of the repositories included
+in the bundle and the TAGs (code version in August 2022) to be used.
 
-The default build-type is 'release'. For a debug build, add '--build=debug' to the ecbuild
-command line.
-
-To work with a different branch than the default for a given project, the branch must be
-modified in the CMakeLists.txt for the bundle.
-
-Note: ecbuild accepts all cmake flags, for example, compilers can be selected with:
-    ecbuild -DCMAKE_CXX_COMPILER=/path/to/gcc-7.2/bin/g++ ${SRC}
 
 To run the mpas-jedi ctests (from build directory):
 
-    cd mpasjedi
+    cd mpas-jedi
     ctest
 
-
---- Working with the code ---
-
-The CMakeLists.txt file in this directory contains the list of the repositories included
-in the bundle and the branch to be used. The branch specified in the CMakeLists.txt is
-the one that will be compiled. When working with you own branch, the should be changed in
-the CMakeLists.txt file but it is not necessary to re-run ecbuild, make is enough.
-
-After the first build, changes in the code can be tested by re-running only
-(from build directory):
-
-    make -j4
-    cd mpasjedi
-    ctest
-
-By default, make will not update your local repository from the remote. To update all repositories
-in the bundle, run (from build directory):
-
-    make update
-
-The update will fail for repositories that contain uncommited code. This is a safety mechanism to
-avoid losing your work.
 
 --- Note about using git ---
 

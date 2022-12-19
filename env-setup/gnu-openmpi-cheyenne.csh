@@ -1,20 +1,15 @@
-# contains atlas/0.30.0 from skylab-2.0.0-gnu-10.1.0
-#
-source /etc/profile.d/modules.csh  # note: needed on non-computing nodes, MPAS-Workflow
+source /etc/profile.d/modules.csh
+setenv OPT /glade/work/jedipara/cheyenne/opt/modules
 module purge
-module unuse /glade/u/apps/ch/modulefiles/default/compilers
-setenv MODULEPATH_ROOT /glade/work/jedipara/cheyenne/spack-stack/modulefiles
-module use /glade/work/jedipara/cheyenne/spack-stack/modulefiles/compilers
-module use /glade/work/jedipara/cheyenne/spack-stack/modulefiles/misc
-module load miniconda/3.9.12
-module load ecflow/5.8.4
-
+module use $OPT/modulefiles/core
+module load jedi/gnu-openmpi/10.1.0
+module load json
+module load json-schema-validator
+module load atlas/ecmwf-0.29.0 # temp. patch until JEDI stack recovers
+unalias ecbuild
+#setenv LOCAL_PATH_JEDI_TESTFILES /glade/u/home/maryamao/JEDI_test_files
+git lfs install
 limit stacksize unlimited
-setenv GFORTRAN_CONVERT_UNIT 'big_endian:101-200'
-module use /glade/work/jedipara/cheyenne/spack-stack/spack-stack-v1/envs/skylab-2.0.0-gnu-10.1.0/install/modulefiles/Core
-module load stack-gcc/10.1.0
-module load stack-openmpi/4.1.1
-module load stack-python/3.9.12
-#module available
-module load jedi-mpas-env/1.0.0
+setenv OOPS_TRACE 0  # Note: Some ctests fail when OOPS_TRACE=1
 module list
+setenv GFORTRAN_CONVERT_UNIT 'big_endian:101-200'

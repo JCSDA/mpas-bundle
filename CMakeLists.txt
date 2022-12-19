@@ -21,7 +21,7 @@ find_package( ecbuild 3.5 REQUIRED HINTS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CUR
 include( ecbuild_bundle )
 ecbuild_bundle_initialize()
 
-ecbuild_bundle( PROJECT jedicmake GIT "https://github.com/JCSDA/jedi-cmake.git" BRANCH develop UPDATE RECURSIVE)
+ecbuild_bundle( PROJECT jedicmake GIT "https://github.com/JCSDA/jedi-cmake.git" TAG b7c8fb7 )
 include( jedicmake/cmake/Functions/git_functions.cmake )
 
 option(BUNDLE_SKIP_ECKIT "Don't build eckit" "ON" ) # Skip eckit build unless user passes -DBUNDLE_SKIP_ECKIT=OFF
@@ -34,14 +34,14 @@ ecbuild_bundle( PROJECT atlas     GIT "https://github.com/ecmwf/atlas.git" TAG 0
 #TODO: When mpas-bundle becomes a public repo, consider changing the default value of BUNDLE_SKIP_ROPP-UFO to "ON"
 option(BUNDLE_SKIP_ROPP-UFO "Don't build ROPP-UFO"  "ON") # Build ropp-ufo unless user passes -DBUNDLE_SKIP_ROPP-UFO=ON
 #ecbuild_bundle( PROJECT ropp-ufo  GIT "https://github.com/JCSDA/ropp-test.git"   BRANCH develop UPDATE )
-ecbuild_bundle( PROJECT crtm      GIT "https://github.com/JCSDA/crtm.git"        BRANCH release/crtm_jedi UPDATE )
+ecbuild_bundle( PROJECT crtm      GIT "https://github.com/JCSDA/crtm.git" TAG bfede42 )
 option(BUNDLE_SKIP_RTTOV "Don't build rttov"  "ON") # Skip rttov build unless user passes -DBUNDLE_SKIP_RTTOV=OFF
-ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA/rttov.git"       BRANCH develop UPDATE )
+#ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA/rttov.git" BRANCH develop UPDATE )
 
-ecbuild_bundle( PROJECT oops      GIT "https://github.com/JCSDA/oops.git"        BRANCH develop UPDATE )
-ecbuild_bundle( PROJECT saber     GIT "https://github.com/JCSDA/saber.git"       BRANCH develop UPDATE)
-ecbuild_bundle( PROJECT ioda      GIT "https://github.com/JCSDA/ioda.git"        BRANCH develop UPDATE )
-ecbuild_bundle( PROJECT ufo       GIT "https://github.com/JCSDA/ufo.git"         BRANCH develop UPDATE)
+ecbuild_bundle( PROJECT oops      GIT "https://github.com/JCSDA/oops.git"  TAG 6557e56 )
+ecbuild_bundle( PROJECT saber     GIT "https://github.com/JCSDA/saber.git" TAG 44ecc0c )
+ecbuild_bundle( PROJECT ioda      GIT "https://github.com/JCSDA/ioda.git"  TAG dca5831 )
+ecbuild_bundle( PROJECT ufo       GIT "https://github.com/JCSDA/ufo.git"   TAG 5bcdfd3 )
 
 # ioda and ufo test data
 #---------------------------------
@@ -56,7 +56,7 @@ find_branch_name(REPO_DIR_NAME ioda)
 # When LOCAL_PATH_JEDI_TESTFILES is set to the directory of IODA test files stored
 # in a local directory, ioda-data repo will not be cloned
 if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
-  ecbuild_bundle( PROJECT ioda-data GIT "https://github.com/JCSDA-internal/ioda-data.git" BRANCH develop UPDATE )
+  ecbuild_bundle( PROJECT ioda-data GIT "https://github.com/JCSDA-internal/ioda-data.git" TAG 81db35e )
 endif()
 
 # If IODA's current branch is available in ioda-data repo, that branch will be checked out
@@ -66,23 +66,32 @@ branch_checkout (REPO_DIR_NAME ioda-data
 # same procedure for ufo-data
 find_branch_name(REPO_DIR_NAME ufo)
 if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
-  ecbuild_bundle( PROJECT ufo-data GIT "https://github.com/JCSDA-internal/ufo-data.git" BRANCH develop UPDATE )
+  ecbuild_bundle( PROJECT ufo-data GIT "https://github.com/JCSDA-internal/ufo-data.git" TAG ea0869c )
 endif()
 
 # If UFO's current branch is available in ioda-data repo, that branch will be checked out
 branch_checkout (REPO_DIR_NAME ufo-data
                  BRANCH ${GIT_BRANCH_FUNC})
 
+# same procedure for saber-data
+find_branch_name(REPO_DIR_NAME saber)
+if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
+  ecbuild_bundle( PROJECT saber-data GIT "https://github.com/JCSDA-internal/saber-data.git" TAG be178e4 )
+endif()
+
+# If saber's current branch is available in saber-data repo, that branch will be checked out
+branch_checkout (REPO_DIR_NAME saber-data
+                 BRANCH ${GIT_BRANCH_FUNC} )
 
 set(MPAS_DOUBLE_PRECISION "ON" CACHE STRING "MPAS-Model: Use double precision 64-bit Floating point.")
 set(MPAS_CORES init_atmosphere atmosphere CACHE STRING "MPAS-Model: cores to build.")
-ecbuild_bundle( PROJECT MPAS GIT "https://github.com/JCSDA-internal/MPAS-Model.git" BRANCH release-stable UPDATE)
-ecbuild_bundle( PROJECT mpas-jedi GIT "https://github.com/JCSDA/mpas-jedi"  BRANCH develop UPDATE)
+ecbuild_bundle( PROJECT MPAS GIT "https://github.com/JCSDA-internal/MPAS-Model.git" TAG 8311e7a )
+ecbuild_bundle( PROJECT mpas-jedi GIT "https://github.com/JCSDA/mpas-jedi" TAG 7e47ecb )
 
 # same procedure for mpas-jedi-data
 find_branch_name(REPO_DIR_NAME mpas-jedi)
 if( NOT DEFINED ENV{LOCAL_PATH_JEDI_TESTFILES} AND NOT DEFINED ${GIT_TAG_FUNC} )
-  ecbuild_bundle( PROJECT mpas-jedi-data GIT "https://github.com/JCSDA-internal/mpas-jedi-data.git" BRANCH develop UPDATE )
+  ecbuild_bundle( PROJECT mpas-jedi-data GIT "https://github.com/JCSDA-internal/mpas-jedi-data.git" TAG 8b5ab19 )
 endif()
 
 # If mpas-jedi's current branch is available in mpas-jedi-data repo, that branch will be checked out
