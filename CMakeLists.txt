@@ -34,7 +34,6 @@ ecbuild_bundle( PROJECT atlas     GIT "https://github.com/ecmwf/atlas.git" TAG 0
 #TODO: When mpas-bundle becomes a public repo, consider changing the default value of BUNDLE_SKIP_ROPP-UFO to "ON"
 option(BUNDLE_SKIP_ROPP-UFO "Don't build ROPP-UFO"  "ON") # Build ropp-ufo unless user passes -DBUNDLE_SKIP_ROPP-UFO=ON
 #ecbuild_bundle( PROJECT ropp-ufo  GIT "https://github.com/JCSDA/ropp-test.git"   BRANCH develop UPDATE )
-ecbuild_bundle( PROJECT crtm      GIT "https://github.com/JCSDA/crtm.git"        BRANCH release/crtm_jedi UPDATE )
 option(BUNDLE_SKIP_RTTOV "Don't build rttov"  "ON") # Skip rttov build unless user passes -DBUNDLE_SKIP_RTTOV=OFF
 ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA/rttov.git"       BRANCH develop UPDATE )
 
