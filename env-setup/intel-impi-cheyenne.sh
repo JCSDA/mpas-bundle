@@ -1,19 +1,20 @@
-# contains atlas/0.31.1
+#
+echo "Loading Spack-Stack 1.3.1"
 #
 source /etc/profile.d/modules.sh  # note: needed on non-computing nodes
 module purge
-module unuse /glade/u/apps/ch/modulefiles/default/compilers
-export MODULEPATH_ROOT=/glade/work/jedipara/cheyenne/spack-stack/modulefiles
-module use /glade/work/jedipara/cheyenne/spack-stack/modulefiles/compilers
+export LMOD_TMOD_FIND_FIRST=yes
 module use /glade/work/jedipara/cheyenne/spack-stack/modulefiles/misc
 module load miniconda/3.9.12
 module load ecflow/5.8.4
+module load mysql/8.0.31
 
-ulimit -s unlimited
-
-module use /glade/work/jedipara/cheyenne/spack-stack/spack-stack-v1/envs/skylab-3.0.0-intel-19.1.1.217/install/modulefiles/Core
+module use /glade/work/epicufsrt/contrib/spack-stack/spack-stack-1.3.1/envs/unified-env/install/modulefiles/Core
 module load stack-intel/19.1.1.217
 module load stack-intel-mpi/2019.7.217
 module load stack-python/3.9.12
-module load jedi-base-env/1.0.0 # this should be jedi-mpas-env/1.0.0, but module does not exist
+module load jedi-mpas-env/unified-dev
 module list
+
+ulimit -s unlimited
+export F_UFMTENDIAN='big_endian:101-200'
