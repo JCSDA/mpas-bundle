@@ -5,7 +5,7 @@ which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 #--- Building the mpas-jedi bundle ---
 #    Assume you have the spack-stack-1.3.1 build environment installed in your computer.
-#    https://github.com/JCSDA/jedi-stack (clone and then checkout the release/1.3.1 branch)
+#    https://github.com/JCSDA/spack-stack (clone and then checkout the release/1.3.1 branch)
 
 #    cd /somewhere/to/store; mkdir mpas-bundle-2.0.0; cd mpas-bundle-2.0.0
 #    git clone -b release/2.0.0 https://github.com/JCSDA/mpas-bundle.git code
