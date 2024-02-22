@@ -90,7 +90,6 @@ To work with a different branch than the default for a given project, the branch
 modified in the CMakeLists.txt for the bundle.
 
 
---- Working with the code ---
 # Working with the code
 
 The CMakeLists.txt file in this directory contains the list of the repositories included
