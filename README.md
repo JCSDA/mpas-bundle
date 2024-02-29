@@ -30,6 +30,11 @@ a given time (defined in seconds by the timeout parameter).
 
 ---
 
+<details>
+<summary><b>Derecho</b></summary>
+<details>
+<summary><b>Bash</b></summary>
+
 1.  Clone the mpas-bundle repository and create an environment variable equal to the repository root directory
     ```bash
     git clone https://github.com/JCSDA-internal/mpas-bundle.git
@@ -79,15 +84,23 @@ progress to the terminal, pass ```-l``` to the ```run_make.bundle.sh``` script.
     ```bash
     qsub <ctest job file name>
     ```
+   
+</details>
+</details>
 
-The cmake command above will clone all the source code for the projects defined in the
-CMakeLists.txt in the bundle and the make command will build them all.
+[//]: # (The cmake command above will clone all the source code for the projects defined in the)
 
-The default build-type is 'release'. For a debug build, add '-DCMAKE_BUILD_TYPE=Debug' to the cmake
-command line.
+[//]: # (CMakeLists.txt in the bundle and the make command will build them all.)
 
-To work with a different branch than the default for a given project, the branch must be
-modified in the CMakeLists.txt for the bundle.
+[//]: # ()
+[//]: # (The default build-type is 'release'. For a debug build, add '-DCMAKE_BUILD_TYPE=Debug' to the cmake)
+
+[//]: # (command line.)
+
+[//]: # ()
+[//]: # (To work with a different branch than the default for a given project, the branch must be)
+
+[//]: # (modified in the CMakeLists.txt for the bundle.)
 
 
 # Working with the code
