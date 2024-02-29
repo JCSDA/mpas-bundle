@@ -30,12 +30,8 @@ a given time (defined in seconds by the timeout parameter).
 
 ---
 
-<details>
-<summary><b>Derecho</b></summary>
-<details>
-<summary><b>Bash</b></summary>
 
-1.  Clone the mpas-bundle repository and create an environment variable equal to the repository root directory
+1. Clone the mpas-bundle repository and create an environment variable equal to the repository root directory
     ```bash
     git clone https://github.com/JCSDA-internal/mpas-bundle.git
     ```
@@ -43,50 +39,48 @@ a given time (defined in seconds by the timeout parameter).
     ```bash
     cd mpas-bundle
     ```
-1. Create an environment variable equal to the repository root directory
+1. Source the configure script in the env-setup directory, which will set several envirnoment variables referenced in the subsequent installation steps. A list of
+   configure arguments is provided below.
+   - ```mpas_bundle_dir```: The absolute path to the mpas-bundle repository root directory.
+   - ```mpas_bundle_buidl_dir```: The absolute path to the mpas-bundle build directory.
+   - ```mpas_bundle_compiler```: The compiler platform that mpas-bundle is built for.
+   - ```mpas_bundle_cmake_flags```: The flags pass to CMake during the configuration step. This is an optional argument. 
     ```bash
-    MPAS_BUNDLE_DIR=$(pwd)
+    source env-setup/configure.sh <mpas_bundle_dir> <mpas_bundle_build_dir> <mpas_bundle_compiler> <mpas_bundle_account> [<mpas_bundle_cmake_flags>]" 
     ```
-1. Create a build directory and enter it.
+    
+1. Create the build directory 
     ```bash
-    mkdir build
-    cd build
+    mkdir ${MPAS_BUNDLE_BUILD_DIR} 
     ```
+1. and enter it.
+   ```bash
+   cd ${MPAS_BUNDLE_BUILD_DIR} 
+   ```
 ## If building on Derecho 
 
-1. Create an environment variable equal to the compiler you want to use.
-    ```bash
-    MPAS_BUNDLE_COMPILER=<intel or gnu>
-    ```
-1. Source the environment mpas-bundle environment script.
-    ```bash
-    source ${MPAS_BUNDLE_DIR}/env-setup/${MPAS_BUNDLE_COMPILER}-derecho.sh
-    ```
 1. Configure the cmake build.
     ```bash
-    cmake ..
+    cmake ${MPAS_BUNDLE_DIR} ${MPAS_BUNDLE_CMAKE_FLAGS}
     ```
 1. Due to resource limitations on derecho it is recommended to build and run ctest on a compute node. To run
 the build on a compute node, create a batch script using the run_make.bundle.sh script in the env-setup directory. If you want to log the build and ctest
 progress to the terminal, pass ```-l``` to the ```run_make.bundle.sh``` script.
     ```bash    
-    bash ${MPAS_BUNDLE_DIR}/env-setup/run_make.bundle.sh -A <account> -e ${MPAS_BUNDLE_DIR}/env-setup -c ${MPAS_BUNDLE_COMPILER} -f <make job file name> -l -n
+    bash ${MPAS_BUNDLE_DIR}/env-setup/run_make.bundle.sh -A ${MPAS_BUNDLE_ACCOUNT} -e ${MPAS_BUNDLE_DIR}/env-setup -c ${MPAS_BUNDLE_COMPILER} -n
     ```
 1. This will create a batch job submission script with the name specified above. After checking the batch script, submit it via
     ```bash
-    qsub <make job file name>
+    qsub make.pbs.sh 
     ```
 1. Once the build has finished, create a batch job script for running ctest
     ```bash    
-    bash ${MPAS_BUNDLE_DIR}/env-setup/run_make.bundle.sh -A <account> -e ${MPAS_BUNDLE_DIR}/env-setup -c ${MPAS_BUNDLE_COMPILER} -f <job file name> -x ctest -l -n
+    bash ${MPAS_BUNDLE_DIR}/env-setup/run_make.bundle.sh -A ${MPAS_BUNDLE_ACCOUNT} -e ${MPAS_BUNDLE_DIR}/env-setup -c ${MPAS_BUNDLE_COMPILER} -x ctest -n
     ```
 1. and submit it.
     ```bash
-    qsub <ctest job file name>
+   qsub ctest.pbs.sh
     ```
-   
-</details>
-</details>
 
 [//]: # (The cmake command above will clone all the source code for the projects defined in the)
 
