@@ -3,10 +3,17 @@
 This software is licensed under the terms of the Apache Licence Version 2.0
 which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
-# Installation Instructions 
+# Installation 
 
 ---
+## Supported Platforms
+__Select one of the below platforms for installation instructions.__
+<details>
+<summary><span style="font-size: 18px; font-weight: bold"> Derecho </span></summary>
+
 ### Note about using git
+
+---
 
 It is recommended that you create a .gitconfig file in your home directory (inside the container
 if working from a container)
@@ -26,12 +33,12 @@ helper = cache --timeout=3600
 ```
 Since the bundle acceses many repositories, it can be tedious to enter your username and
 password for every operation. With the last line the system will remember your password for
-a given time (defined in seconds by the timeout parameter).
+a given time (defined in seconds by the timeout parameter). __Also make sure that Git LFS is installed, and enabled prior
+to building ```mpas-bundle```__. Git LFS can be installed via ```git lfs install```.
 
 ---
 
-
-1. Clone the mpas-bundle repository and create an environment variable equal to the repository root directory
+1. Clone the mpas-bundle repository. 
     ```bash
     git clone https://github.com/JCSDA-internal/mpas-bundle.git
     ```
@@ -44,7 +51,7 @@ a given time (defined in seconds by the timeout parameter).
    - ```mpas_bundle_dir```: The absolute path to the mpas-bundle repository root directory.
    - ```mpas_bundle_buidl_dir```: The absolute path to the mpas-bundle build directory.
    - ```mpas_bundle_compiler```: The compiler platform that mpas-bundle is built for.
-   - ```mpas_bundle_cmake_flags```: The flags pass to CMake during the configuration step. This is an optional argument. 
+   - ```mpas_bundle_cmake_flags```: The flags passed to CMake during the configuration step. This is an optional argument. 
     ```bash
     source env-setup/configure.sh <mpas_bundle_dir> <mpas_bundle_build_dir> <mpas_bundle_compiler> <mpas_bundle_account> [<mpas_bundle_cmake_flags>]" 
     ```
@@ -53,12 +60,10 @@ a given time (defined in seconds by the timeout parameter).
     ```bash
     mkdir ${MPAS_BUNDLE_BUILD_DIR} 
     ```
-1. and enter it.
+   and enter it.
    ```bash
    cd ${MPAS_BUNDLE_BUILD_DIR} 
    ```
-## If building on Derecho 
-
 1. Configure the cmake build.
     ```bash
     cmake ${MPAS_BUNDLE_DIR} ${MPAS_BUNDLE_CMAKE_FLAGS}
@@ -81,40 +86,5 @@ progress to the terminal, pass ```-l``` to the ```run_make.bundle.sh``` script.
     ```bash
    qsub ctest.pbs.sh
     ```
+</details>
 
-[//]: # (The cmake command above will clone all the source code for the projects defined in the)
-
-[//]: # (CMakeLists.txt in the bundle and the make command will build them all.)
-
-[//]: # ()
-[//]: # (The default build-type is 'release'. For a debug build, add '-DCMAKE_BUILD_TYPE=Debug' to the cmake)
-
-[//]: # (command line.)
-
-[//]: # ()
-[//]: # (To work with a different branch than the default for a given project, the branch must be)
-
-[//]: # (modified in the CMakeLists.txt for the bundle.)
-
-
-# Working with the code
-
-The CMakeLists.txt file in this directory contains the list of the repositories included
-in the bundle and the branch to be used. The branch specified in the CMakeLists.txt is
-the one that will be compiled. When working with you own branch, the should be changed in
-the CMakeLists.txt file, but it is not necessary to re-run cmake, make is enough.
-
-After the first build, changes in the code can be tested by re-running only
-(from build directory in an interactive session on a compute node):
-
-    make -j4
-    cd mpas-jedi
-    ctest
-
-By default, make will not update your local repository from the remote. To update all repositories
-in the bundle, run (from build directory):
-
-    make update
-
-The update will fail for repositories that contain uncommited code. This is a safety mechanism to
-avoid losing your work.
