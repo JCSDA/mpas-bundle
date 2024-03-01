@@ -9,7 +9,7 @@ which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 ## Supported Platforms
 __Select one of the below platforms for installation instructions.__
 <details>
-<summary><span style="font-size: 18px; font-weight: bold"> Derecho </span></summary>
+<summary><b> Derecho </b></summary>
 
 ### Note about using git
 
