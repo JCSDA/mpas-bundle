@@ -7,6 +7,12 @@ if [ "$#" -lt 4 ]; then
     exit 1
 fi
 
+# Check if conda is installed. If it is, deactivate it.
+if command -v conda >/dev/null 2>&1; then
+    conda deactivate
+fi
+
+
 # Assign mandatory arguments to variables
 MPAS_BUNDLE_DIR=$1
 MPAS_BUNDLE_BUILD_DIR=$2
