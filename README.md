@@ -37,7 +37,7 @@ Run the following commands in your terminal:
    Clone the `mpas-bundle` repository and navigate into the repository's root directory.
 
     ```bash
-    git clone https://github.com/JCSDA-internal/mpas-bundle.git
+    git clone https://github.com/JCSDA/mpas-bundle.git
     cd mpas-bundle
     ```
 <a id="env_script"></a>
