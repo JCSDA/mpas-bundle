@@ -55,7 +55,7 @@ _**For performance and memory reasons, it is recommended to compile ```mpas-bund
   The compiler/shell specific environment configuration commands are listed in the below table.
 
   |              | GNU | Intel |
-          |:------------:|:--------------:|:----------------:|
+  |:------------:|:--------------:|:----------------:|
   | __zsh/bash__ | `source env-setup/gnu-derecho.sh` | `source env-setup/intel-derecho.sh` |
   | __csh/tcsh__ | `source env-setup/gnu-derecho.csh` | `source env-setup/intel-derecho.csh` |
 * Create and navigate into the build directory.
@@ -66,9 +66,8 @@ _**For performance and memory reasons, it is recommended to compile ```mpas-bund
   ```bash
     cd <mpas-bundle_build_dir> 
     ```
-* Run CMake to configure the build. Though not required, you can pass flags to cmake that define the build type,
-  makefile
-  verbosity, build engine, and compiler flags. A table of useful CMake flags can be found [here](#useful-cmake-flags).
+* Run CMake to configure the build. Though not required, you can pass flags to cmake that define the build type, makefile 
+verbosity, build engine, and compiler flags. A table of useful CMake flags can be found [here](#useful-cmake-flags).
 
     ```bash
     cmake <mpas-bundle_dir> <cmake_flags> 
@@ -112,9 +111,8 @@ _**Due to resource limitations, it's recommended to build and run tests on a com
    ```bash
    make -j8
    ```
-  and run ctest. You can execute ctest without any flags to run all available tests with default settings.
-  However, ctest supports numerous flags that allow you to customize the test execution. For a table of
-  useful ```ctest```
+  and run ctest. You can execute ctest without any flags to run all available tests with default settings. 
+  However, ctest supports numerous flags that allow you to customize the test execution. For a table of useful ```ctest```
   flags, click [here](#useful-ctest-flags).
   ```bash
   ctest <ctest_flags>
@@ -126,7 +124,7 @@ _**Due to resource limitations, it's recommended to build and run tests on a com
 |----------------------------|---------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | `-G`                       | Specifies the generator to use for the build system.                                  | ```Unix Makefiles```, ```Ninja```, etc.                            |
 | `-DCMAKE_BUILD_TYPE`       | Defines the type of build.                                                            | ```Debug```, ```Release```, ```RelWithDebInfo```, ```MinSizeRel``` |
-| `-DCMAKE_VERBOSE_MAKEFILE` | Enables verbose output from the makefile, useful for debugging.                       | ```ON```, ```OFF```                                                |
+| `-DCMAKE_VERBOSE_MAKEFILE` | Enables verbose output from the makefile, useful for debugging.                       | ```ON```, ```OFF```                                                        |
 | `-DCMAKE_C_FLAGS`          | Allows specification of additional flags for the C compiler.                          | Compiler flags (e.g., `-O3`, `-Wall`, etc.)                        |
 | `-DCMAKE_CXX_FLAGS`        | Allows specification of additional flags for the C++ compiler.                        | Compiler flags (e.g., `-O3`, `-Wall`, etc.)                        |
 | `-DCMAKE_Fortran_FLAGS`    | Allows specification of additional flags for the Fortran compiler.                    | Compiler flags (e.g., `-O3`, `-Wall`, etc.)                        |
@@ -135,22 +133,22 @@ _**Due to resource limitations, it's recommended to build and run tests on a com
 
 ### Useful CTest Flags
 
-| Flag                      | Description                                                                                                        | Acceptable Values                                                   |
-|---------------------------|--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
-| `--build-and-test`        | Build and test a project.                                                                                          | Path to project and build tree, additional arguments                |
-| `--test-action`           | Specifies the action to perform (e.g., test, start, update, configure, build).                                     | ```test```, ```start```, ```update```, ```configure```, ```build``` |
-| `--output-on-failure`     | Output anything from the test program if it fails.                                                                 | N/A                                                                 |
-| `--parallel`              | Run the tests in parallel using the given number of jobs.                                                          | Number of jobs (e.g., `4`)                                          |
-| `--schedule-random`       | Schedule tests in random order.                                                                                    | N/A                                                                 |
-| `--stop-on-failure`       | Stop running tests after the first test fails.                                                                     | N/A                                                                 |
-| `--timeout`               | Set a global timeout for all tests, after which CTest will kill the test.                                          | Timeout in seconds (e.g., `120`)                                    |
-| `--verbose`               | Enable verbose output from tests.                                                                                  | N/A                                                                 |
-| `--repeat`                | Repeat the tests according to a specified mode (e.g., until fail, until pass, after timeout).                      | ```until-fail```, ```until-pass```, ```after-timeout```             |
-| `--extra-submit`          | Specify files to submit to a dashboard. Files are submitted to the first dashboard mentioned in CTestConfig.cmake. | File paths                                                          |
-| `--label-summary`         | Print a summary of test results grouped by label.                                                                  | N/A                                                                 |
-| `--subproject-summary`    | Print a summary of test results grouped by subproject.                                                             | N/A                                                                 |
-| `-C` or `--build-config`  | Specify the configuration type to build/test when using a multi-configuration generator (e.g., Visual Studio).     | ```Debug```, ```Release```, ```MinSizeRel```, ```RelWithDebInfo```  |
-| `-R` or `--tests-regex`   | Run only the tests whose names match the given regular expression.                                                 | Regular expression (e.g., `MyTest*`)                                |
-| `-E` or `--exclude-regex` | Exclude tests whose names match the given regular expression.                                                      | Regular expression (e.g., `LongRunningTest*`)                       |
-| `-L` or `--label-regex`   | Run only the tests with labels matching the given regular expression.                                              | Regular expression (e.g., `Nightly*`)                               |
-| `-j` or `--parallel`      | Run the tests in parallel using the given number of jobs.                                                          | Number of jobs (same as `--parallel`)                               |
+| Flag                         | Description                                                                                               | Acceptable Values                                               |
+|------------------------------|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
+| `--build-and-test`           | Build and test a project.                                                                                 | Path to project and build tree, additional arguments            |
+| `--test-action`              | Specifies the action to perform (e.g., test, start, update, configure, build).                            | ```test```, ```start```, ```update```, ```configure```, ```build```                 |
+| `--output-on-failure`        | Output anything from the test program if it fails.                                                        | N/A                                                             |
+| `--parallel`                 | Run the tests in parallel using the given number of jobs.                                                 | Number of jobs (e.g., `4`)                                      |
+| `--schedule-random`          | Schedule tests in random order.                                                                           | N/A                                                             |
+| `--stop-on-failure`          | Stop running tests after the first test fails.                                                            | N/A                                                             |
+| `--timeout`                  | Set a global timeout for all tests, after which CTest will kill the test.                                 | Timeout in seconds (e.g., `120`)                                |
+| `--verbose`                  | Enable verbose output from tests.                                                                         | N/A                                                             |
+| `--repeat`                   | Repeat the tests according to a specified mode (e.g., until fail, until pass, after timeout).             | ```until-fail```, ```until-pass```, ```after-timeout```                     |
+| `--extra-submit`             | Specify files to submit to a dashboard. Files are submitted to the first dashboard mentioned in CTestConfig.cmake. | File paths                                                      |
+| `--label-summary`            | Print a summary of test results grouped by label.                                                         | N/A                                                             |
+| `--subproject-summary`       | Print a summary of test results grouped by subproject.                                                    | N/A                                                             |
+| `-C` or `--build-config`      | Specify the configuration type to build/test when using a multi-configuration generator (e.g., Visual Studio). | ```Debug```, ```Release```, ```MinSizeRel```, ```RelWithDebInfo```            |
+| `-R` or `--tests-regex`       | Run only the tests whose names match the given regular expression.                                        | Regular expression (e.g., `MyTest*`)                            |
+| `-E` or `--exclude-regex`    | Exclude tests whose names match the given regular expression.                                             | Regular expression (e.g., `LongRunningTest*`)                   |
+| `-L` or `--label-regex`       | Run only the tests with labels matching the given regular expression.                                     | Regular expression (e.g., `Nightly*`)                           |
+| `-j` or `--parallel`         | Run the tests in parallel using the given number of jobs.                                                 | Number of jobs (same as `--parallel`)                           |
