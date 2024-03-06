@@ -33,6 +33,8 @@ Run the following commands in your terminal:
 
 ### Installation Steps
 
+_**For performance and memory reasons, it is recommended to compile ```mpas-bundle``` using the gnu platform.**_
+
 * **Clone the Repository:**
    Clone the `mpas-bundle` repository and navigate into the repository's root directory.
 
