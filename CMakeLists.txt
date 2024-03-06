@@ -39,6 +39,7 @@ ecbuild_bundle( PROJECT rttov     GIT "https://github.com/JCSDA/rttov.git"      
 
 ecbuild_bundle( PROJECT oops      GIT "https://github.com/JCSDA/oops.git"        BRANCH develop UPDATE )
 ecbuild_bundle( PROJECT saber     GIT "https://github.com/JCSDA/saber.git"       BRANCH develop UPDATE)
+ecbuild_bundle( PROJECT crtm      GIT "https://github.com/JCSDA/CRTMv3.git"               BRANCH develop UPDATE )
 ecbuild_bundle( PROJECT ioda      GIT "https://github.com/JCSDA/ioda.git"        BRANCH develop UPDATE )
 ecbuild_bundle( PROJECT ufo       GIT "https://github.com/JCSDA/ufo.git"         BRANCH develop UPDATE)
 

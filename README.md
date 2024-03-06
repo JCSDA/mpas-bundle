@@ -3,88 +3,108 @@
 This software is licensed under the terms of the Apache Licence Version 2.0
 which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
-# Installation 
+# Table of Contents
+* [Installation](#installation)
+  * [Git Configuration](#git-configuration)
+  * [Installation Steps](#installation-steps)
+  * [Building on a Compute Node](#building-on-a-compute-node)
+  * [Building in an Interactive Session](#building-in-an-interactive-session)
+# Installation
 
----
-## Supported Platforms
-__Select one of the below platforms for installation instructions.__
-<details>
-<summary><b> Derecho </b></summary>
+### Git Configuration
+* It's recommended to configure Git using command line to simplify repository access. You can set your 
+name and email, which helps avoid repeatedly entering your credentials. 
+Run the following commands in your terminal:
+    ```bash
+    # Set your name
+  git config --global user.name "Your Name"
 
-### Note about using git
+  # Set your email
+  git config --global user.email "yourname@somewhere.something"
 
----
+  # Set credential helper with timeout
+  git config --global credential.helper 'cache --timeout=3600'
+    ```
+* Ensure Git LFS is installed and configured prior to building ```mpas-bundle```.
 
-It is recommended that you create a .gitconfig file in your home directory (inside the container
-if working from a container)
-```bash
-vim ${HOME}/.gitconfig
-```
+     ```bash
+     git lfs install
+     ```
 
-with the following content:
+### Installation Steps
 
-```bash
-[user]
-name = Your Name
-email = yourname@somewhere.something
+* **Clone the Repository:**
+   Clone the `mpas-bundle` repository and navigate into the repository's root directory.
 
-[credential]
-helper = cache --timeout=3600
-```
-Since the bundle acceses many repositories, it can be tedious to enter your username and
-password for every operation. With the last line the system will remember your password for
-a given time (defined in seconds by the timeout parameter). __Also make sure that Git LFS is installed, and enabled prior
-to building ```mpas-bundle```__. Git LFS can be installed via ```git lfs install```.
-
----
-
-1. Clone the mpas-bundle repository. 
     ```bash
     git clone https://github.com/JCSDA-internal/mpas-bundle.git
-    ```
-    and navigate into the repository root directory.
-    ```bash
     cd mpas-bundle
     ```
-1. Source the configure script in the env-setup directory, which will set several envirnoment variables referenced in the subsequent installation steps. A list of
-   configure arguments is provided below.
-   - ```mpas_bundle_dir```: The absolute path to the mpas-bundle repository root directory.
-   - ```mpas_bundle_buidl_dir```: The absolute path to the mpas-bundle build directory.
-   - ```mpas_bundle_compiler```: The compiler platform that mpas-bundle is built for.
-   - ```mpas_bundle_cmake_flags```: The flags passed to CMake during the configuration step. This is an optional argument. 
-    ```bash
-    source env-setup/configure.sh <mpas_bundle_dir> <mpas_bundle_build_dir> <mpas_bundle_compiler> <mpas_bundle_account> [<mpas_bundle_cmake_flags>]" 
-    ```
-    
-1. Create the build directory 
-    ```bash
-    mkdir ${MPAS_BUNDLE_BUILD_DIR} 
-    ```
-   and enter it.
-   ```bash
-   cd ${MPAS_BUNDLE_BUILD_DIR} 
-   ```
-1. Configure the cmake build.
-    ```bash
-    cmake ${MPAS_BUNDLE_DIR} ${MPAS_BUNDLE_CMAKE_FLAGS}
-    ```
-1. Due to resource limitations on derecho it is recommended to build and run ctest on a compute node. To run
-the build on a compute node, create a batch script using the run_make.bundle.sh script in the env-setup directory. If you want to log the build and ctest
-progress to the terminal, pass ```-l``` to the ```run_make.bundle.sh``` script.
-    ```bash    
-    bash ${MPAS_BUNDLE_DIR}/env-setup/run_make.bundle.sh -A ${MPAS_BUNDLE_ACCOUNT} -e ${MPAS_BUNDLE_DIR}/env-setup -c ${MPAS_BUNDLE_COMPILER} -n
-    ```
-1. This will create a batch job submission script with the name specified above. After checking the batch script, submit it via
-    ```bash
-    qsub make.pbs.sh 
-    ```
-1. Once the build has finished, create a batch job script for running ctest
-    ```bash    
-    bash ${MPAS_BUNDLE_DIR}/env-setup/run_make.bundle.sh -A ${MPAS_BUNDLE_ACCOUNT} -e ${MPAS_BUNDLE_DIR}/env-setup -c ${MPAS_BUNDLE_COMPILER} -x ctest -n
-    ```
-1. and submit it.
-    ```bash
-   qsub ctest.pbs.sh
-    ```
-</details>
+<a id="env_script"></a>
+* To set up your environment for building ```mpas-bundle```, run the appropriate environment setup script for your computing and compiler platform. 
+The compiler/shell specific environment configuration commands are listed in the below table.
+ 
+  |              | GNU | Intel |
+  |:------------:|:--------------:|:----------------:|
+  | __zsh/bash__ | `source env-setup/gnu-derecho.sh` | `source env-setup/intel-derecho.sh` |
+  | __csh/tcsh__ | `source env-setup/gnu-derecho.csh` | `source env-setup/intel-derecho.csh` |
+* Create and navigate into the build directory.
 
+  ```bash
+    mkdir <mpas-bundle_build_dir> 
+  ```
+  ```bash
+    cd <mpas-bundle_build_dir> 
+    ```
+* Run CMake to configure the build. 
+
+    ```bash
+    cmake <mpas-bundle_build_dir> 
+    ```
+
+### Building on a Compute Node
+
+_**Due to resource limitations, it's recommended to build and run tests on a compute node.**_
+
+* Use the `run_make.bundle.sh` script to generate a batch job for building.
+
+  ```bash
+  bash <mpas_bundle_dir>/env-setup/run_make.bundle.sh -A <derecho_account> -e <mpas-bundle_dir>/env-setup -c <compiler> -n
+  ```
+* Submit the job with ```qsub```.
+  ```bash
+  qsub make.pbs.sh 
+  ```
+
+* When the above job finishes, generate a batch job for running mpas-jedi's test suite and submit it using ```qsub``` 
+  ```bash
+  bash <mpas_bundle_dir>/env-setup/run_make.bundle.sh -A <derecho_account> -e <mpas-bundle_dir>/env-setup -c <compiler> -x ctest -n
+  ```
+  ```bash
+  qsub ctest.pbs.sh
+  ```
+
+### Building in an Interactive Session
+
+* Start an interactive session. 
+  ```bash
+  qsub -A <derecho_account> -N cc-mpas-bundle -q main -l walltime=03:00:00 -l select=1:ncpus=8 -I
+  ```
+* Once the session starts, source the environment configuration script as you did in this [step](#env_script).
+* Enter the ```mpas-bundle``` build directory
+   ```bash
+   cd <mpas_bundle_build_dir>
+   ```
+  and start the build. Make sure to specify the number of cores ```GNU Make``` should use with the ```-j``` flag.
+In the below command, ```mpas-bundle``` is compiled using 8 cores.
+   ```bash
+   make -j8
+   ```
+* When the build has finished, enter the ```mpas-jedi``` directory
+  ```bash
+  cd mpas-jedi
+  ```
+  and run ctest.
+  ```bash
+  ctest
+  ```
