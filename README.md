@@ -61,7 +61,7 @@ The compiler/shell specific environment configuration commands are listed in the
 * Run CMake to configure the build. 
 
     ```bash
-    cmake <mpas-bundle_build_dir> 
+    cmake <mpas-bundle_dir> 
     ```
 
 ### Building on a Compute Node
