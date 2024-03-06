@@ -4,6 +4,11 @@ source /etc/profile.d/z00_modules.sh
 
 export LMOD_TMOD_FIND_FIRST=yes
 
+# Check if conda is installed. If it is, deactivate it.
+if command -v conda >/dev/null 2>&1; then
+    conda deactivate
+fi
+
 module purge
 # ignore that the sticky module ncarenv/... is not unloaded
 module load ncarenv/23.09

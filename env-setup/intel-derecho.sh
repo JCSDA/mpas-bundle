@@ -4,6 +4,11 @@ source /etc/profile.d/z00_modules.sh
 
 export LMOD_TMOD_FIND_FIRST=yes
 
+# Check if conda is installed. If it is, deactivate it.
+if command -v conda >/dev/null 2>&1; then
+    conda deactivate
+fi
+
 module purge
 module use /lustre/desc1/scratch/epicufsrt/contrib/modulefiles
 module use /lustre/desc1/scratch/epicufsrt/contrib/modulefiles_extra

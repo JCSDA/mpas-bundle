@@ -3,6 +3,11 @@
 source /etc/profile.d/z00_modules.csh
 setenv LMOD_TMOD_FIND_FIRST yes
 
+# Check if conda is installed. If it is, deactivate it.
+if ( `which conda >& /dev/null` ) then
+    conda deactivate
+endif
+
 module purge
 # ignore that the sticky module ncarenv/... is not unloaded
 module load ncarenv/23.09

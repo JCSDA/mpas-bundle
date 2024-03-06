@@ -4,6 +4,11 @@ source /etc/profile.d/z00_modules.csh
 
 setenv LMOD_TMOD_FIND_FIRST yes
 
+# Check if conda is installed. If it is, deactivate it.
+if ( `which conda >& /dev/null` ) then
+    conda deactivate
+endif
+
 # modules for building on derecho with the intel toolchain
 #
 
