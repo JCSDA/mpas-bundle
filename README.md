@@ -55,8 +55,7 @@ _**For performance and memory reasons, it is recommended to compile ```mpas-bund
   The compiler/shell specific environment configuration commands are listed in the below table.
 
   |              | GNU | Intel |
-  ```bash
-            |:------------:|:--------------:|:----------------:|
+  |:------------:|:--------------:|:----------------:|
   | __zsh/bash__ | `source <mpas_bundle_dir>/env-setup/gnu-derecho.sh` | `source <mpas_bundle_dir>/env-setup/intel-derecho.sh` |
   | __csh/tcsh__ | `source <mpas_bundle_dir>/env-setup/gnu-derecho.csh` | `source <mpas_bundle_dir>/env-setup/intel-derecho.csh` |
 * Create and navigate into the build directory.
