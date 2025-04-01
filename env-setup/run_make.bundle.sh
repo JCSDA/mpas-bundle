@@ -17,6 +17,8 @@ QUEUE_OPTS=""
 ACCOUNT=""
 ENV_DIR=""
 NAME=""
+PRIORITY=regular
+SEND_MAIL=""
 
 # vars for setting the environment
 HPC="unknown"
@@ -25,7 +27,7 @@ COMPILER=""
 # vars for creating the batch script
 EXEC=""
 DEFAULT_EXEC="make"
-NTHREADS=8
+NTHREADS=32
 
 # vars for controlling this script
 RUN=""
@@ -45,18 +47,21 @@ export GFORTRAN_CONVERT_UNIT='big_endian:101-200'
 
 usage()
 {
-	echo "usage: $0 -A account -c gnu|intel [-x make|ctest|echo] [-c compiler] [-l] "
-	echo "  [-q queue] [-t threads] [-N name] [-f job-file] [-n] [-e env-dir] [-h] "
+	echo "usage: $0 -A account -c gnu|intel [-x make|ctest|both|echo] [-l] "
+	echo "  [-q queue] [-p priority][-t threads] [-N name] [-f job-file] [-m] [-n] [-e env-dir] [-h] "
 	echo
 	echo "  account is the HPC account number"
-	echo "  -c compiler is one of [ $DERECHO_CC ]"
+	echo "  -c <compiler> is one of [ $DERECHO_CC ]"
 	echo "  -x to specify what to run, default is -x $DEFAULT_EXEC"
+  echo "      both will submit one job which will run make and run ctest"
 	echo "      use echo to submit a job which only sets the environment (for testing)"
 	echo "  -l: wait for job to start and log progress"
 	echo "  -q queue is one of [ ${QUEUE_OPTS[@]} ], default is $QUEUE"
+	echo "  -p priority is one of [ regular|premium|economy ], default is $PRIORITY"
 	echo "  -t threads is the number of threads to run, default is $NTHREADS"
 	echo "  -N name is a name for the job, default is mpas-${DEFAULT_EXEC}"
 	echo "  -f job file is the file to be created and submitted to a compute node, default is ${DEFAULT_EXEC}.pbs.sh"
+	echo "  -m: send email when the job completes, default is no email"
 	echo "  -n: don't submit the job to a compute node, only create the batch file"
 	echo "  -e env-dir is the directory with the module scripts"
 	echo "  -h: print help and exit"
@@ -68,6 +73,8 @@ usage()
 #
 echo $HOST | grep -q derecho
 if [ $? == 0 ]; then
+  HPC="derecho"
+elif [ "cron" == "$HOST" ]; then
   HPC="derecho"
 fi
 
@@ -84,17 +91,19 @@ if [ $# == 0 ]; then
 fi
 
 # get comamnd line args
-while getopts A:e:x:q:c:N:f:t:nhlv flag
+while getopts A:e:x:q:p:c:N:f:t:mnhlv flag
 do
 	case "${flag}" in
 		A) ACCOUNT=${OPTARG};;
 		e) ENV_DIR=${OPTARG};;
 		q) QUEUE="-q ${OPTARG}";;
+    p) PRIORITY=${OPTARG};;
 		c) COMPILER=${OPTARG};;
 		N) NAME=${OPTARG};;
 		f) JOB_FILE=${OPTARG};;
 		x) DEFAULT_EXEC=${OPTARG};;
 		t) NTHREADS=${OPTARG};;
+    m) SEND_MAIL="PBS -m ae";;
 		n) RUN="echo";;
 		h) HELP="help";;
     l) LOG="monitor";;
@@ -164,6 +173,8 @@ if [ "$DEFAULT_EXEC" == "make" ]; then
 	EXEC="$DEFAULT_EXEC -j$NTHREADS"
 elif [ "$DEFAULT_EXEC" == "ctest" ]; then
 	EXEC="cd mpas-jedi && ctest"
+elif [ "$DEFAULT_EXEC" == "both" ]; then
+	EXEC="make -j$NTHREADS && cd mpas-jedi && ctest"
 elif [ "$DEFAULT_EXEC" == "echo" ]; then
 	EXEC="echo finished"
 else
@@ -176,15 +187,20 @@ cat > $JOB_FILE << EOF
 #!/usr/bin/env bash
 
 #PBS -l walltime=01:00:00
+#PBS -o ./$JOB_FILE.log
+#PBS -e ./$JOB_FILE.err.log
 #PBS -j oe
 #PBS -k eod
 #--- get 1 cpu per thread
-#PBS -l select=1:ncpus=$NTHREADS
+#PBS -l select=1:ncpus=$NTHREADS:mem=32GB
+#PBS -l job_priority=$PRIORITY
 #--- 
 #PBS -N $NAME
 #PBS -A $ACCOUNT
 #PBS $QUEUE
+#${SEND_MAIL}
 
+echo "compiler:${COMPILER}"
 date
 EOF
 

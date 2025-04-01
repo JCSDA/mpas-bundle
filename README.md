@@ -56,22 +56,23 @@ _**For performance and memory reasons, it is recommended to compile ```mpas-bund
 
   |              | GNU | Intel |
   |:------------:|:--------------:|:----------------:|
-  | __zsh/bash__ | `source env-setup/gnu-derecho.sh` | `source env-setup/intel-derecho.sh` |
-  | __csh/tcsh__ | `source env-setup/gnu-derecho.csh` | `source env-setup/intel-derecho.csh` |
+  | __zsh/bash__ | `source <mpas_bundle_dir>/env-setup/gnu-derecho.sh` | `source <mpas_bundle_dir>/env-setup/intel-derecho.sh` |
+  | __csh/tcsh__ | `source <mpas_bundle_dir>/env-setup/gnu-derecho.csh` | `source <mpas_bundle_dir>/env-setup/intel-derecho.csh` |
 * Create and navigate into the build directory.
 
-  ```bash
-    mkdir <mpas-bundle_build_dir> 
-  ```
-  ```bash
+    mkdir -p <mpas-bundle_build_dir> 
     cd <mpas-bundle_build_dir> 
-    ```
-* Run CMake to configure the build. Though not required, you can pass flags to cmake that define the build type, makefile 
-verbosity, build engine, and compiler flags. A table of useful CMake flags can be found [here](#useful-cmake-flags).
+* To configure the build using CMake, set the `MPAS_DOUBLE_PRECISION` flag according to your usage needs: 
+  enable it (`-DMPAS_DOUBLE_PRECISION=ON`) for running the `mpas-jedi` test suite, or 
+  disable it for `MPAS-Workflow` calculations when using the `mpas-bundle` build. 
+  The default setting for `MPAS_DOUBLE_PRECISION` is `ON`.
+  
+  ```bash
+  cmake <mpas_bundle_dir> -DMPAS_DOUBLE_PRECISION=<ON|OFF> <cmake_flags>
+  ```
 
-    ```bash
-    cmake <mpas-bundle_dir> <cmake_flags> 
-    ```
+  Though not required, you can pass flags to cmake that define the build type, makefile
+  verbosity, build engine, and compiler flags. A table of useful CMake flags can be found [here](#useful-cmake-flags).
 
 ### Building on a Compute Node
 
@@ -80,7 +81,7 @@ _**Due to resource limitations, it's recommended to build and run tests on a com
 * Use the `run_make.bundle.sh` script to generate a batch job for building.
 
   ```bash
-  bash <mpas_bundle_dir>/env-setup/run_make.bundle.sh -A <derecho_account> -e <mpas-bundle_dir>/env-setup -c <compiler> -n
+  bash <mpas_bundle_dir>/env-setup/run_make.bundle.sh -A <derecho_account> -c <compiler> -n
   ```
 * Submit the job with ```qsub```.
   ```bash
@@ -89,7 +90,7 @@ _**Due to resource limitations, it's recommended to build and run tests on a com
 
 * When the above job finishes, generate a batch job for running mpas-jedi's test suite and submit it using ```qsub```
   ```bash
-  bash <mpas_bundle_dir>/env-setup/run_make.bundle.sh -A <derecho_account> -e <mpas-bundle_dir>/env-setup -c <compiler> -x ctest -n
+  <mpas_bundle_dir>/env-setup/run_make.bundle.sh -A <derecho_account> -c <compiler> -x ctest -n
   ```
   ```bash
   qsub ctest.pbs.sh
@@ -99,7 +100,7 @@ _**Due to resource limitations, it's recommended to build and run tests on a com
 
 * Start an interactive session.
   ```bash
-  qsub -A <derecho_account> -N cc-mpas-bundle -q main -l walltime=03:00:00 -l select=1:ncpus=8 -I
+  qsub -A <derecho_account> -N cc-mpas-bundle -q main -l walltime=03:00:00 -l select=1:ncpus=32 -I
   ```
 * Once the session starts, source the environment configuration script as you did in this [step](#env_script).
 * Enter the ```mpas-bundle``` build directory
@@ -107,48 +108,50 @@ _**Due to resource limitations, it's recommended to build and run tests on a com
    cd <mpas_bundle_build_dir>
    ```
   and start the build. Make sure to specify the number of cores ```GNU Make``` should use with the ```-j``` flag.
-  In the below command, ```mpas-bundle``` is compiled using 8 cores.
+  In the below command, ```mpas-bundle``` is compiled using 32 cores.
    ```bash
-   make -j8
+   make -j32
    ```
-  and run ctest. You can execute ctest without any flags to run all available tests with default settings. 
-  However, ctest supports numerous flags that allow you to customize the test execution. For a table of useful ```ctest```
-  flags, click [here](#useful-ctest-flags).
+  When ```mpas-bundle``` is finished building, enter the ```mpas-jedi``` build directory 
+  ```bash
+  cd <mpas_bundle_build_dir>/mpas-jedi
+  ```
+  and run ctest. 
   ```bash
   ctest <ctest_flags>
   ```
+  You can execute ctest without any flags to run all available tests with default settings.
+  However, ctest supports numerous flags that allow you to customize the test execution. For a table of
+  useful ```ctest```
+  flags, click [here](#useful-ctest-flags).
 
 ### Useful CMake Flags
 
-| Flag                       | Description                                                                           | Acceptable Values                                                  |
-|----------------------------|---------------------------------------------------------------------------------------|--------------------------------------------------------------------|
-| `-G`                       | Specifies the generator to use for the build system.                                  | ```Unix Makefiles```, ```Ninja```, etc.                            |
-| `-DCMAKE_BUILD_TYPE`       | Defines the type of build.                                                            | ```Debug```, ```Release```, ```RelWithDebInfo```, ```MinSizeRel``` |
-| `-DCMAKE_VERBOSE_MAKEFILE` | Enables verbose output from the makefile, useful for debugging.                       | ```ON```, ```OFF```                                                        |
-| `-DCMAKE_C_FLAGS`          | Allows specification of additional flags for the C compiler.                          | Compiler flags (e.g., `-O3`, `-Wall`, etc.)                        |
-| `-DCMAKE_CXX_FLAGS`        | Allows specification of additional flags for the C++ compiler.                        | Compiler flags (e.g., `-O3`, `-Wall`, etc.)                        |
-| `-DCMAKE_Fortran_FLAGS`    | Allows specification of additional flags for the Fortran compiler.                    | Compiler flags (e.g., `-O3`, `-Wall`, etc.)                        |
-| `-D`                       | Passes any variable definition to CMake, used for custom options in `CMakeLists.txt`. | Variable=Value (e.g., `MY_CUSTOM_OPTION=ON`, etc.)                 |
-| `--build`                  | Builds a CMake-generated project binary tree.                                         | Build directory path                                               |
+| Flag                       | Description                                                           | Acceptable Values                                | Default              |
+|----------------------------|-----------------------------------------------------------------------|--------------------------------------------------|----------------------|
+| `-G`                       | Specifies the generator to use for the build system.                  | ```Unix Makefiles```, ```Ninja```, ```Meson```.  | ```Unix Makefiles``` |
+| `-DCMAKE_BUILD_TYPE`       | Defines the type of build.                                            | ```Debug```, ```Release```, ```RelWithDebInfo``` | ```Release```        |
+| `-DCMAKE_VERBOSE_MAKEFILE` | Enables verbose output from the makefile, useful for debugging.       | ```ON```, ```OFF```                              | ```OFF```            |
+| `-DMPAS_DOUBLE_PRECISION`  | __MPAS-MODEL__: Use double precision for floating point calculations. | ```ON```, ```OFF```                              | ```ON```             | 
 
 ### Useful CTest Flags
 
-| Flag                         | Description                                                                                               | Acceptable Values                                               |
-|------------------------------|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
-| `--build-and-test`           | Build and test a project.                                                                                 | Path to project and build tree, additional arguments            |
-| `--test-action`              | Specifies the action to perform (e.g., test, start, update, configure, build).                            | ```test```, ```start```, ```update```, ```configure```, ```build```                 |
-| `--output-on-failure`        | Output anything from the test program if it fails.                                                        | N/A                                                             |
-| `--parallel`                 | Run the tests in parallel using the given number of jobs.                                                 | Number of jobs (e.g., `4`)                                      |
-| `--schedule-random`          | Schedule tests in random order.                                                                           | N/A                                                             |
-| `--stop-on-failure`          | Stop running tests after the first test fails.                                                            | N/A                                                             |
-| `--timeout`                  | Set a global timeout for all tests, after which CTest will kill the test.                                 | Timeout in seconds (e.g., `120`)                                |
-| `--verbose`                  | Enable verbose output from tests.                                                                         | N/A                                                             |
-| `--repeat`                   | Repeat the tests according to a specified mode (e.g., until fail, until pass, after timeout).             | ```until-fail```, ```until-pass```, ```after-timeout```                     |
-| `--extra-submit`             | Specify files to submit to a dashboard. Files are submitted to the first dashboard mentioned in CTestConfig.cmake. | File paths                                                      |
-| `--label-summary`            | Print a summary of test results grouped by label.                                                         | N/A                                                             |
-| `--subproject-summary`       | Print a summary of test results grouped by subproject.                                                    | N/A                                                             |
-| `-C` or `--build-config`      | Specify the configuration type to build/test when using a multi-configuration generator (e.g., Visual Studio). | ```Debug```, ```Release```, ```MinSizeRel```, ```RelWithDebInfo```            |
-| `-R` or `--tests-regex`       | Run only the tests whose names match the given regular expression.                                        | Regular expression (e.g., `MyTest*`)                            |
-| `-E` or `--exclude-regex`    | Exclude tests whose names match the given regular expression.                                             | Regular expression (e.g., `LongRunningTest*`)                   |
-| `-L` or `--label-regex`       | Run only the tests with labels matching the given regular expression.                                     | Regular expression (e.g., `Nightly*`)                           |
-| `-j` or `--parallel`         | Run the tests in parallel using the given number of jobs.                                                 | Number of jobs (same as `--parallel`)                           |
+| Flag                      | Description                                                                                                        | Acceptable Values                                                   |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| `--build-and-test`        | Build and test a project.                                                                                          | Path to project and build tree, additional arguments                |
+| `--test-action`           | Specifies the action to perform (e.g., test, start, update, configure, build).                                     | ```test```, ```start```, ```update```, ```configure```, ```build``` |
+| `--output-on-failure`     | Output anything from the test program if it fails.                                                                 | N/A                                                                 |
+| `--parallel`              | Run the tests in parallel using the given number of jobs.                                                          | Number of jobs (e.g., `32`)                                         |
+| `--schedule-random`       | Schedule tests in random order.                                                                                    | N/A                                                                 |
+| `--stop-on-failure`       | Stop running tests after the first test fails.                                                                     | N/A                                                                 |
+| `--timeout`               | Set a global timeout for all tests, after which CTest will kill the test.                                          | Timeout in seconds (e.g., `120`)                                    |
+| `--verbose`               | Enable verbose output from tests.                                                                                  | N/A                                                                 |
+| `--repeat`                | Repeat the tests according to a specified mode (e.g., until fail, until pass, after timeout).                      | ```until-fail```, ```until-pass```, ```after-timeout```             |
+| `--extra-submit`          | Specify files to submit to a dashboard. Files are submitted to the first dashboard mentioned in CTestConfig.cmake. | File paths                                                          |
+| `--label-summary`         | Print a summary of test results grouped by label.                                                                  | N/A                                                                 |
+| `--subproject-summary`    | Print a summary of test results grouped by subproject.                                                             | N/A                                                                 |
+| `-C` or `--build-config`  | Specify the configuration type to build/test when using a multi-configuration generator.                           | ```Debug```, ```Release```, ```RelWithDebInfo```                    |
+| `-R` or `--tests-regex`   | Run only the tests whose names match the given regular expression.                                                 | Regular expression (e.g., `MyTest*`)                                |
+| `-E` or `--exclude-regex` | Exclude tests whose names match the given regular expression.                                                      | Regular expression (e.g., `LongRunningTest*`)                       |
+| `-L` or `--label-regex`   | Run only the tests with labels matching the given regular expression.                                              | Regular expression (e.g., `Nightly*`)                               |
+| `-j` or `--parallel`      | Run the tests in parallel using the given number of jobs.                                                          | Number of jobs (same as `--parallel`)                               |
