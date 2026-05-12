@@ -45,6 +45,8 @@ _**For performance and memory reasons, it is recommended to compile ```mpas-bund
 
     ```bash
     git clone https://github.com/JCSDA/mpas-bundle.git
+  ```
+    ```bash
     cd mpas-bundle
     ```
 
@@ -60,8 +62,12 @@ _**For performance and memory reasons, it is recommended to compile ```mpas-bund
   | __csh/tcsh__ | `source <mpas_bundle_dir>/env-setup/gnu-derecho.csh` | `source <mpas_bundle_dir>/env-setup/intel-derecho.csh` |
 * Create and navigate into the build directory.
 
+  ```bash
     mkdir -p <mpas-bundle_build_dir> 
+  ```
+  ```bash
     cd <mpas-bundle_build_dir> 
+    ```
 * To configure the build using CMake, set the `MPAS_DOUBLE_PRECISION` flag according to your usage needs: 
   enable it (`-DMPAS_DOUBLE_PRECISION=ON`) for running the `mpas-jedi` test suite, or 
   disable it for `MPAS-Workflow` calculations when using the `mpas-bundle` build. 
