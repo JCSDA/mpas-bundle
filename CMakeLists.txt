@@ -62,6 +62,7 @@ else()
     ecbuild_bundle( PROJECT ioda      GIT "https://github.com/JCSDA/ioda.git"        BRANCH develop UPDATE )
     option(ENABLE_UFO_DATA "Obtain ufo test data from ufo-data repository (vs tarball)" ON)
     ecbuild_bundle( PROJECT ufo-data  GIT "https://github.com/JCSDA-internal/ufo-data.git"    BRANCH develop UPDATE )
+    ecbuild_bundle( PROJECT ufo       GIT "https://github.com/JCSDA/ufo.git"                  BRANCH develop UPDATE )
 
     # Build IODA converters if requested
     option(BUILD_IODA_CONVERTERS "Build IODA Converters" OFF)
