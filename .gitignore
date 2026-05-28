@@ -16,6 +16,7 @@ crtm/
 eckit/
 fckit/
 ioda/
+iodaconv/
 jedicmake/
 MPAS/
 mpas-jedi/
