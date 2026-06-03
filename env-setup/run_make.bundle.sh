@@ -36,7 +36,7 @@ LOG=""
 VERBOSE=""
 
 # derecho params
-DERECHO_CC="gnu intel"
+DERECHO_CC="gnu intel nvhpc"
 DERECHO_CC_INTEL="intel"
 DERECHO_Q=("main" "develop" )
 QUEUE_OPTS=${DERECHO_Q[@]}
@@ -47,7 +47,7 @@ export GFORTRAN_CONVERT_UNIT='big_endian:101-200'
 
 usage()
 {
-	echo "usage: $0 -A account -c gnu|intel [-x make|ctest|both|echo] [-l] "
+	echo "usage: $0 -A account -c gnu|intel|nvhpc [-x make|ctest|both|echo] [-l] "
 	echo "  [-q queue] [-p priority][-t threads] [-N name] [-f job-file] [-m] [-n] [-e env-dir] [-h] "
 	echo
 	echo "  account is the HPC account number"
@@ -79,7 +79,7 @@ elif [ "cron" == "$HOST" ]; then
 fi
 
 if [ "$HPC" = "derecho" ]; then
-	QUEUE="-q ${DERECHO_Q[0]}"
+	QUEUE="-q ${DERECHO_Q[1]}"
 	QUEUE_OPTS=${DERECHO_Q[@]}
 else
 	echo "unsupported HPC, must run on HPC login node"
@@ -113,14 +113,14 @@ done
 
 if [ "$ACCOUNT" = "" ]; then
 	echo "account (-A) is required"
-	echo "   something like nmmm0004"
+	echo "   something like nmmm0015"
 	echo
 	usage
 fi
 
 if [ "$COMPILER" = "" ]; then
 	echo "compiler (-c) is required"
-	echo "gnu or intel"
+	echo "  one of $DERECHO_CC"
 	echo
 	usage
 fi
@@ -159,8 +159,10 @@ if [ "$HPC" == "derecho" ]; then
     MODFILE="${ENV_DIR}/gnu-derecho.sh"
 	elif [ "$COMPILER" == "intel" ]; then
     MODFILE="${ENV_DIR}/intel-derecho.sh"
+	elif [ "$COMPILER" == "nvhpc" ]; then
+    MODFILE="${ENV_DIR}/nvhpc-derecho.sh"
 	else
-		echo unknown compiler: $COMPILER, must be either "gnu" or "intel"
+		echo "unknown compiler: $COMPILER, must be one of $DERECHO_CC"
 		echo
 		usage
 	fi
