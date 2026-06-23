@@ -47,13 +47,13 @@ export GFORTRAN_CONVERT_UNIT='big_endian:101-200'
 
 usage()
 {
-	echo "usage: $0 -A account -c gnu|intel|nvhpc [-x make|ctest|both|echo] [-l] "
+	echo "usage: $0 -A account -c gnu|intel|nvhpc [-x make|ctest|ctest-ioda|both|echo] [-l] "
 	echo "  [-q queue] [-p priority][-t threads] [-N name] [-f job-file] [-m] [-n] [-e env-dir] [-h] "
 	echo
 	echo "  account is the HPC account number"
 	echo "  -c <compiler> is one of [ $DERECHO_CC ]"
 	echo "  -x to specify what to run, default is -x $DEFAULT_EXEC"
-  echo "      both will submit one job which will run make and run ctest"
+  echo "      both will submit one job which will run make and run mpas-jedi ctest"
 	echo "      use echo to submit a job which only sets the environment (for testing)"
 	echo "  -l: wait for job to start and log progress"
 	echo "  -q queue is one of [ ${QUEUE_OPTS[@]} ], default is $QUEUE"
@@ -171,10 +171,16 @@ if [ "$VERBOSE" != "" ]; then
   echo modfile:$MODFILE
 fi
 
+IODA_MODS=""
+IODA_ARGS="-R \"ncar|satbias|iodaconv_bufr|_dpr_gpm|amsr2_gcom|_gmi_gpmiodaconv_atms|iodaconv_tropics|_gnssaro_netcdf_conv\" "
 if [ "$DEFAULT_EXEC" == "make" ]; then
 	EXEC="$DEFAULT_EXEC -j$NTHREADS"
 elif [ "$DEFAULT_EXEC" == "ctest" ]; then
 	EXEC="cd mpas-jedi && ctest"
+elif [ "$DEFAULT_EXEC" == "ctest-ioda" ]; then
+	EXEC="cd iodaconv && ctest $IODA_ARGS"
+  IODA_MODS="${ENV_DIR}/ioda-modules.list"
+  NAME="ioda-ctest"
 elif [ "$DEFAULT_EXEC" == "both" ]; then
 	EXEC="make -j$NTHREADS && cd mpas-jedi && ctest"
 elif [ "$DEFAULT_EXEC" == "echo" ]; then
@@ -194,7 +200,7 @@ cat > $JOB_FILE << EOF
 #PBS -j oe
 #PBS -k eod
 #--- get 1 cpu per thread
-#PBS -l select=1:ncpus=$NTHREADS:mem=32GB
+#PBS -l select=1:ncpus=$NTHREADS:mem=${NTHREADS}GB
 #PBS -l job_priority=$PRIORITY
 #--- 
 #PBS -N $NAME
@@ -207,7 +213,11 @@ date
 EOF
 
 cat $MODFILE >> $JOB_FILE
+if [ "$IODA_MODS" != "" ]; then
+  cat $IODA_MODS >> $JOB_FILE
+fi
 echo $EXEC >> $JOB_FILE
+
 
 # submit the job to a compute node
 if [ "$RUN" = "" ]; then
