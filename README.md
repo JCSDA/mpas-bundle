@@ -60,6 +60,9 @@ _**For performance and memory reasons, it is recommended to compile ```mpas-bund
   |:------------:|:--------------:|:----------------:|
   | __zsh/bash__ | `source <mpas_bundle_dir>/env-setup/gnu-derecho.sh` | `source <mpas_bundle_dir>/env-setup/intel-derecho.sh` |
   | __csh/tcsh__ | `source <mpas_bundle_dir>/env-setup/gnu-derecho.csh` | `source <mpas_bundle_dir>/env-setup/intel-derecho.csh` |
+
+  If you want to run the tests for the ioda converters, `source <mpas_bundle_dir>/env-setup/ioda-modules.list` for any shell.
+
 * Create and navigate into the build directory.
 
   ```bash
@@ -74,8 +77,9 @@ _**For performance and memory reasons, it is recommended to compile ```mpas-bund
   The default setting for `MPAS_DOUBLE_PRECISION` is `ON`.
   
   ```bash
-  cmake <mpas_bundle_dir> -DMPAS_DOUBLE_PRECISION=<ON|OFF> <cmake_flags>
+  cmake <mpas_bundle_dir> -DMPAS_DOUBLE_PRECISION=<ON|OFF>  [ -DBUILD_IODA_CONVERTERS=ON ] <cmake_flags>
   ```
+  Only provide `-DBUILD_IODA_CONVERTERS=ON` if you need the ioda converters built.
 
   Though not required, you can pass flags to cmake that define the build type, makefile
   verbosity, build engine, and compiler flags. A table of useful CMake flags can be found [here](#useful-cmake-flags).
@@ -100,6 +104,14 @@ _**Due to resource limitations, it's recommended to build and run tests on a com
   ```
   ```bash
   qsub ctest.pbs.sh
+  ```
+
+* If you built the ioda converters, generate a batch job for running the ioda converters test suite and submit it using ```qsub```
+  ```bash
+  <mpas_bundle_dir>/env-setup/run_make.bundle.sh -A <derecho_account> -c <compiler> -x ctest-ioda -n
+  ```
+  ```bash
+  qsub ctest-ioda.pbs.sh
   ```
 
 ### Building in an Interactive Session
@@ -130,6 +142,15 @@ _**Due to resource limitations, it's recommended to build and run tests on a com
   However, ctest supports numerous flags that allow you to customize the test execution. For a table of
   useful ```ctest```
   flags, click [here](#useful-ctest-flags).
+
+  If you built the ioda converters, when ```mpas-bundle``` is finished building, enter the ```iodaconv``` build directory 
+  ```bash
+  cd <mpas_bundle_build_dir>/iodaconv
+  ```
+  and run ctest. 
+  ```bash
+  ctest -R "ncar|satbias|iodaconv_bufr|_dpr_gpm|amsr2_gcom|_gmi_gpmiodaconv_atms|iodaconv_tropics|_gnssaro_netcdf_conv" <ctest_flags>
+  ```
 
 ### Useful CMake Flags
 
