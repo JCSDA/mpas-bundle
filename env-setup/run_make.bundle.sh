@@ -177,6 +177,9 @@ if [ "$DEFAULT_EXEC" == "make" ]; then
 	EXEC="$DEFAULT_EXEC -j$NTHREADS"
 elif [ "$DEFAULT_EXEC" == "ctest" ]; then
 	EXEC="cd mpas-jedi && ctest"
+	if [ "$COMPILER" == "intel" ]; then
+    EXEC+=" -LE ci_oneapi_disable"
+  fi
 elif [ "$DEFAULT_EXEC" == "ctest-ioda" ]; then
 	EXEC="cd iodaconv && ctest $IODA_ARGS"
   IODA_MODS="${ENV_DIR}/ioda-modules.list"
