@@ -11,7 +11,7 @@
 # Usage: cmake <mpas-bundle src dir> -DCMAKE_BUILD_TYPE=RelWithDebINfo -DCMAKE_VERBOSE_MAKEFILE=ON -DMPAS_DOUBLE_PRECISION=OFF
 
 cmake_minimum_required( VERSION 3.14 )
-project( mpas-bundle VERSION 3.0.0 LANGUAGES C CXX Fortran )
+project( mpas-bundle VERSION 4.0.0 LANGUAGES C CXX Fortran )
 
 ## ECBuild integration
 include(GNUInstallDirs)

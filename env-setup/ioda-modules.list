@@ -1,0 +1,15 @@
+# Following modules are needed to run the ioda-converters ctests
+module load py-netcdf4/1.7.1.post2
+module load py-h5py/3.12.1
+module load py-python-dateutil/2.8.2
+module load py-xarray/2024.7.0
+module load py-pyhdf/0.11.4
+module load py-scipy/1.14.1
+module load py-pyyaml/6.0.2
+module load py-cartopy/0.24.1
+module load py-eccodes/1.5.0
+module load py-pyproj/3.7.0
+
+module list
+
+

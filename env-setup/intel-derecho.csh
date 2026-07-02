@@ -36,6 +36,9 @@ module load parallelio/2.6.2
 module load gsl-lite/0.37.0
 module load nccmp/1.9.0.1
 module load udunits/2.2.28
+# Following modules are required for ioda-converters build
+module load bufr/12.1.0
+module load py-pybind11/2.13.5
 module list
 
 limit stacksize unlimited
