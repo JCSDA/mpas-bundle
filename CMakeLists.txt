@@ -61,7 +61,7 @@ else()
     # Build IODA converters if requested
     option(BUILD_IODA_CONVERTERS "Build IODA Converters" OFF)
     if(BUILD_IODA_CONVERTERS)
-        ecbuild_bundle( PROJECT iodaconv GIT "https://github.com/jcsda-internal/ioda-converters.git" TAG f62d401 )
+        ecbuild_bundle( PROJECT iodaconv GIT "https://github.com/jcsda-internal/ioda-converters.git" TAG 1.0.0 )
     endif()
 
     # Find external ESMF for mpas-model (optional)
